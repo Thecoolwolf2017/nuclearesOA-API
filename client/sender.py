@@ -5,9 +5,12 @@ import hashlib
 import os
 from datetime import datetime, timezone
 
-# API config
-API_URL = "https://nuclearesoa-api.onrender.com/api/state"
-API_KEY = "sike".encode()
+# Load config
+with open("client/config.json") as f:
+    config = json.load(f)
+
+API_URL = config["API_URL"]
+API_KEY = config["API_KEY"].encode()
 
 game_data = { 
     "CORE_TEMP": 500.0,
