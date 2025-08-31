@@ -1,7 +1,6 @@
-from fastapi  import FastAPI, Request, HTTPException
+from fastapi  import FastAPI, Request, HTTPException, Query
 from pydantic import BaseModel
 from typing   import Dict
-from datetime import datetime, timezone
 
 import os, sys, hmac, hashlib
 
@@ -38,9 +37,21 @@ async def update_state(request: Request):
 
     return {"status": "updated", "updated_keys": list(payload["data"].keys())}
 
-@app.get("/api/state")
-async def get_state():
-    return {
-        "last_updated": last_updated,
-        "data": current_state
-    }
+@app.get("/api/state/{view}")
+async def get_state_view(view: str, keys: str = Query(None)):
+    global current_state, last_updated
+
+    if keys and view:
+        raise HTTPException(status_code=400, detail="Use either 'keys' query OR 'view' path, not both")
+
+    if keys:
+        selected = {k: current_state.get(k) for k in keys.split(",") if k in current_state}
+        return {"last_updated": last_updated, "data": selected}
+
+    prefix = view.upper()
+    selected = {k: v for k, v in current_state.items() if k.startswith(prefix + "_")}
+
+    if not selected:
+        raise HTTPException(status_code=404, detail=f"No variables found for view '{view}'")
+
+    return {"last_updated": last_updated, "data": selected}
