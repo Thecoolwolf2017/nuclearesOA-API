@@ -2,7 +2,7 @@ from fastapi  import FastAPI, Request, HTTPException, Query
 from pydantic import BaseModel
 from typing   import Dict
 
-import os, sys, hmac, hashlib
+import os, sys, hmac, hashlib, json
 
 app = FastAPI()
 
@@ -37,21 +37,19 @@ async def update_state(request: Request):
 
     return {"status": "updated", "updated_keys": list(payload["data"].keys())}
 
-@app.get("/api/state/{view}")
-async def get_state_view(view: str, keys: str = Query(None)):
+with open("variables.json", "r") as f:
+    GROUPS: Dict[str, list] = json.load(f)
+
+@app.get("/api/state/{group}")
+async def get_state_group(group: str):
     global current_state, last_updated
 
-    if keys and view:
-        raise HTTPException(status_code=400, detail="Use either 'keys' query OR 'view' path, not both")
+    vars_in_group = GROUPS.get(group.upper())
+    if not vars_in_group:
+        raise HTTPException(status_code=404, detail=f"No group '{group}' defined")
 
-    if keys:
-        selected = {k: current_state.get(k) for k in keys.split(",") if k in current_state}
-        return {"last_updated": last_updated, "data": selected}
-
-    prefix = view.upper()
-    selected = {k: v for k, v in current_state.items() if k.startswith(prefix + "_")}
-
+    selected = {k: current_state.get(k) for k in vars_in_group if k in current_state}
     if not selected:
-        raise HTTPException(status_code=404, detail=f"No variables found for view '{view}'")
+        raise HTTPException(status_code=404, detail=f"No variables found for group '{group}'")
 
     return {"last_updated": last_updated, "data": selected}
