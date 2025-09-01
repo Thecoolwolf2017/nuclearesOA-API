@@ -1,7 +1,4 @@
-import requests
-import json
-import hmac
-import hashlib
+import json, hmac, time, hashlib, requests
 from datetime import datetime, timezone
 
 # Load config
@@ -12,7 +9,7 @@ API_URL = config["API_URL"]
 API_KEY = config["API_KEY"].encode()
 
 # Game webserver endpoint
-GAME_URL = "http://localhost:8785/?Variable=WEBSERVER_BATCH_GET&value=*"
+GAME_URL = config["GAME_URL"] + "/?Variable=WEBSERVER_BATCH_GET&value=*"
 
 def deep_parse(d):
     """Recursively parse JSON strings into dicts where possible"""
