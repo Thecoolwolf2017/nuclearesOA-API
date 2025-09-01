@@ -27,7 +27,7 @@ async def update_state(request: Request):
         raise HTTPException(status_code=403, detail="Invalid signature")
 
     payload = await request.json()
-    current_state.update(payload["data"])
+    current_state = payload["data"]
     last_updated = payload.get("timestamp")
 
     return {"status": "updated", "updated_keys": list(payload["data"].keys())}
