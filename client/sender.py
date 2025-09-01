@@ -23,25 +23,24 @@ def deep_parse(d):
             deep_parse(v)
     return d
 
-resp = requests.get(GAME_URL)
-print("Game WebServer HTTP response code: ", resp.status_code)
+while True:
+    print("API SYNC ", end="")
+    try:
+        resp = requests.get(GAME_URL)
+        raw_data = json.loads(resp.text)
+        game_data = deep_parse(raw_data.get("values", {}))
+        payload = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "data": game_data
+        }
+        body = json.dumps(payload).encode()
+        signature = hmac.new(API_KEY, body, hashlib.sha256).hexdigest()
+        headers = {"X-Signature": signature}
+        response = requests.post(API_URL, data=body, headers=headers)
 
-try:
-    raw_data = json.loads(resp.text)
-    game_data = deep_parse(raw_data.get("values", {}))
-except Exception as e:
-    print("Failed to parse game response:", e)
-    game_data = {}
+        print("OK")
 
-payload = {
-    "timestamp": datetime.now(timezone.utc).isoformat(),
-    "data": game_data
-}
+    except Exception as e:
+        print("FAIL: ", e)
 
-body = json.dumps(payload).encode()
-signature = hmac.new(API_KEY, body, hashlib.sha256).hexdigest()
-
-headers = {"X-Signature": signature}
-response = requests.post(API_URL, data=body, headers=headers)
-
-print("API response code:", response.status_code)
+    time.sleep(5)
