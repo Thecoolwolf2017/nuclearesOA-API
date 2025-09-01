@@ -1,21 +1,20 @@
-from fastapi  import FastAPI, Request, HTTPException, Query
+from fastapi  import FastAPI, Request, HTTPException
 from pydantic import BaseModel
 from typing   import Dict
 
 import os, sys, hmac, hashlib, json
 
-app = FastAPI()
+API_KEY = os.getenv("API_KEY", "changeme").encode()
+app     = FastAPI()
 
 current_state: Dict[str, float] = {}
-last_updated: str = None  # ISO 8601 string
-
-API_KEY = os.getenv("API_KEY", "changeme").encode()
-
-if API_KEY == b"changeme":
-    print("WARNING: API_KEY is set to default 'changeme'. Please configure it in Render environment variables.", file=sys.stderr)
+last_updated:  str = None  # ISO 8601 string
 
 class GameState(BaseModel):
     data: Dict[str, float]
+
+if API_KEY == b"changeme":
+    print("WARNING: API_KEY is set to default 'changeme'. Please configure it in Render environment variables.", file=sys.stderr)
 
 @app.post("/api/state")
 async def update_state(request: Request):

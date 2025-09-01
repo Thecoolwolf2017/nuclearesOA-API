@@ -25,19 +25,16 @@ def deep_parse(d):
 
 while True:
     print("API SYNC ", end="")
+    
     try:
         resp = requests.get(GAME_URL)
         raw_data = json.loads(resp.text)
         game_data = deep_parse(raw_data.get("values", {}))
-        payload = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "data": game_data
-        }
+        payload = {"timestamp": datetime.now(timezone.utc).isoformat(),"data": game_data}
         body = json.dumps(payload).encode()
         signature = hmac.new(API_KEY, body, hashlib.sha256).hexdigest()
         headers = {"X-Signature": signature}
         response = requests.post(API_URL, data=body, headers=headers)
-
         print("OK")
 
     except Exception as e:
