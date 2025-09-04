@@ -1,7 +1,7 @@
 from fastapi  import FastAPI, Request, HTTPException
 from typing   import Dict
 
-import os, sys, hmac, hashlib, json
+import os, sys, hmac, hashlib, yaml
 
 API_KEY = os.getenv("API_KEY", "changeme").encode()
 app     = FastAPI()
@@ -32,8 +32,8 @@ async def update_state(request: Request):
 
     return {"status": "updated", "updated_keys": list(payload["data"].keys())}
 
-with open("variables.json", "r") as f:
-    GROUPS: Dict[str, list] = json.load(f)
+with open("variables.yaml", "r") as f:
+    GROUPS: Dict[str, list] = yaml.safe_load(f)
 
 @app.get("/api/state/{group}")
 async def get_state_group(group: str):
