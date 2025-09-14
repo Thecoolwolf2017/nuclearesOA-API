@@ -160,27 +160,27 @@
         "EMERGENCY_GENERATOR_1_MODE": {
           "type": "string",
           "description": "Emergency generator 1 mode",
-          "enum": [
-            "MANUAL",
-            "AUTOMATICO"
+          "oneOf": [
+            { "const": "MANUAL", "description": "Manual" },
+            { "const": "AUTOMATICO", "description": "Automatic" }
           ]
         },
         "EMERGENCY_GENERATOR_1_STATUS": {
           "type": "string",
           "description": "Emergency generator 1 status",
-          "enum": [
-            "INACTIVO",
-            "INICIANDO",
-            "GENERANDO"
+          "oneOf": [
+            { "const": "INACTIVO", "description": "Inactive" },
+            { "const": "INICIANDO", "description": "Starting" },
+            { "const": "GENERANDO", "description": "Generating" }
           ]
         },
         "EMERGENCY_GENERATOR_1_PRESSURIZER": {
           "type": "string",
           "description": "Emergency generator 1 pressurizer state",
-          "enum": [
-            "INACTIVO",
-            "PRESURIZANDO",
-            "PRESURIZADO"
+          "oneOf": [
+            { "const": "INACTIVO", "description": "Inactive" },
+            { "const": "PRESURIZANDO", "description": "Pressurizing" },
+            { "const": "PRESURIZADO", "description": "Pressurized" }
           ]
         },
         "EMERGENCY_GENERATOR_1_FUEL": {
@@ -196,27 +196,27 @@
         "EMERGENCY_GENERATOR_2_MODE": {
           "type": "string",
           "description": "Emergency generator 2 mode",
-          "enum": [
-            "MANUAL",
-            "AUTOMATICO"
+          "oneOf": [
+            { "const": "MANUAL", "description": "Manual" },
+            { "const": "AUTOMATICO", "description": "Automatic" }
           ]
         },
         "EMERGENCY_GENERATOR_2_STATUS": {
           "type": "string",
           "description": "Emergency generator 2 status",
-          "enum": [
-            "INACTIVO",
-            "INICIANDO",
-            "GENERANDO"
+          "oneOf": [
+            { "const": "INACTIVO", "description": "Inactive" },
+            { "const": "INICIANDO", "description": "Starting" },
+            { "const": "GENERANDO", "description": "Generating" }
           ]
         },
         "EMERGENCY_GENERATOR_2_PRESSURIZER": {
           "type": "string",
           "description": "Emergency generator 2 pressurizer state",
-          "enum": [
-            "INACTIVO",
-            "PRESURIZANDO",
-            "PRESURIZADO"
+          "oneOf": [
+            { "const": "INACTIVO", "description": "Inactive" },
+            { "const": "PRESURIZANDO", "description": "Pressurizing" },
+            { "const": "PRESURIZADO", "description": "Pressurized" }
           ]
         },
         "EMERGENCY_GENERATOR_2_FUEL": {
