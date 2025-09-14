@@ -1,0 +1,1655 @@
+{
+  "type": "object",
+  "properties": {
+    "META": {
+      "type": "object",
+      "properties": {
+        "GAME_VERSION": {
+          "type": "string",
+          "description": "Current game build version string"
+        },
+        "GAME_DIFFICULTY": {
+          "type": "number",
+          "description": "Selected game difficulty"
+        },
+        "GAME_SIM_SPEED": {
+          "type": "number",
+          "description": "Simulation speed multiplier"
+        }
+      }
+    },
+    "WEATHER": {
+      "type": "object",
+      "properties": {
+        "TIME": {
+          "type": "string",
+          "description": "Current in-game time HH:MM"
+        },
+        "TIME_DAY": {
+          "type": "integer",
+          "description": "Current day in simulation"
+        },
+        "AMBIENT_TEMPERATURE": {
+          "type": "number",
+          "description": "Outside ambient temperature in Celsius"
+        }
+      }
+    },
+    "CONTROL_RODS": {
+      "type": "object",
+      "properties": {
+        "RODS_POS_ACTUAL": {
+          "type": "number",
+          "description": "Average control rod insertion across all banks",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_0_ORDERED": {
+          "type": "number",
+          "description": "Ordered position of rod bank 0",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_0_ACTUAL": {
+          "type": "number",
+          "description": "Actual position of rod bank 0",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_1_ORDERED": {
+          "type": "number",
+          "description": "Ordered position of rod bank 1",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_1_ACTUAL": {
+          "type": "number",
+          "description": "Actual position of rod bank 1",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_2_ORDERED": {
+          "type": "number",
+          "description": "Ordered position of rod bank 2",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_2_ACTUAL": {
+          "type": "number",
+          "description": "Actual position of rod bank 2",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_3_ORDERED": {
+          "type": "number",
+          "description": "Ordered position of rod bank 3",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_3_ACTUAL": {
+          "type": "number",
+          "description": "Actual position of rod bank 3",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_4_ORDERED": {
+          "type": "number",
+          "description": "Ordered position of rod bank 4",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_4_ACTUAL": {
+          "type": "number",
+          "description": "Actual position of rod bank 4",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_5_ORDERED": {
+          "type": "number",
+          "description": "Ordered position of rod bank 5",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_5_ACTUAL": {
+          "type": "number",
+          "description": "Actual position of rod bank 5",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_6_ORDERED": {
+          "type": "number",
+          "description": "Ordered position of rod bank 6",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_6_ACTUAL": {
+          "type": "number",
+          "description": "Actual position of rod bank 6",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_7_ORDERED": {
+          "type": "number",
+          "description": "Ordered position of rod bank 7",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_7_ACTUAL": {
+          "type": "number",
+          "description": "Actual position of rod bank 7",
+          "minimum": 0,
+          "maximum": 100    
+        },
+        "ROD_BANK_POS_8_ORDERED": {
+          "type": "number",
+          "description": "Ordered position of rod bank 8",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ROD_BANK_POS_8_ACTUAL": {
+          "type": "number",
+          "description": "Actual position of rod bank 8",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "PLANT_POWER": {
+      "type": "object",
+      "properties": {
+        "EMERGENCY_GENERATOR_1_MODE": {
+          "type": "string",
+          "description": "Emergency generator 1 mode",
+          "enum": [
+            "MANUAL",
+            "AUTOMATICO"
+          ]
+        },
+        "EMERGENCY_GENERATOR_1_STATUS": {
+          "type": "string",
+          "description": "Emergency generator 1 status",
+          "enum": [
+            "INACTIVO",
+            "INICIANDO",
+            "GENERANDO"
+          ]
+        },
+        "EMERGENCY_GENERATOR_1_PRESSURIZER": {
+          "type": "string",
+          "description": "Emergency generator 1 pressurizer state",
+          "enum": [
+            "INACTIVO",
+            "PRESURIZANDO",
+            "PRESURIZADO"
+          ]
+        },
+        "EMERGENCY_GENERATOR_1_FUEL": {
+          "type": "integer",
+          "description": "Emergency generator 1 fuel remaining",
+          "minimum": 0,
+          "maximum": 500
+        },
+        "EMERGENCY_GENERATOR_1_MAINTENANCE_NEEDED": {
+          "type": "boolean",
+          "description": "Emergency generator 1 maintenance requirement"
+        },
+        "EMERGENCY_GENERATOR_2_MODE": {
+          "type": "string",
+          "description": "Emergency generator 2 mode",
+          "enum": [
+            "MANUAL",
+            "AUTOMATICO"
+          ]
+        },
+        "EMERGENCY_GENERATOR_2_STATUS": {
+          "type": "string",
+          "description": "Emergency generator 2 status",
+          "enum": [
+            "INACTIVO",
+            "INICIANDO",
+            "GENERANDO"
+          ]
+        },
+        "EMERGENCY_GENERATOR_2_PRESSURIZER": {
+          "type": "string",
+          "description": "Emergency generator 2 pressurizer state",
+          "enum": [
+            "INACTIVO",
+            "PRESURIZANDO",
+            "PRESURIZADO"
+          ]
+        },
+        "EMERGENCY_GENERATOR_2_FUEL": {
+          "type": "integer",
+          "description": "Emergency generator 2 fuel remaining",
+          "minimum": 0,
+          "maximum": 500
+        },
+        "EMERGENCY_GENERATOR_2_MAINTENANCE_NEEDED": {
+          "type": "boolean",
+          "description": "Emergency generator 2 maintenance requirement"
+        },
+        "EMERGENCY_GENERATOR_POWER_OUTPUT_KW": {
+          "type": "number",
+          "description": "Combined emergency generator electrical output in kW"
+        },
+        "EMERGENCY_BATTERIES_POWER_OUTPUT_KW": {
+          "type": "number",
+          "description": "Battery electrical output in kW"
+        },
+        "EMERGENCY_BATTERIES_MODE": {
+          "type": "integer",
+          "description": "Battery mode",
+          "oneOf": [
+                { "const": 1, "description": "Auto" },
+                { "const": 2, "description": "Charge" },
+                { "const": 3, "description": "Discharge" }
+            ]
+        },
+        "POWER_FROM_EXTERNAL_KW": {
+          "type": "number",
+          "description": "Electrical input from external grid in kW"
+        },
+        "POWER_FROM_TURBINE_KW": {
+          "type": "number",
+          "description": "Electrical input from turbine generators in kW"
+        },
+        "POWER_DEMAND_MW": {
+          "type": "number",
+          "description": "Total plant demand in MW"
+        }
+      }
+    },
+    "CHEMICAL": {
+      "type": "object",
+      "properties": {
+        "CHEM_TRUCK_CONNECTED": {
+          "type": "boolean",
+          "description": "Chemical truck connection state"
+        },
+        "CHEM_BORON_DOSAGE_ORDERED": {
+          "type": "number",
+          "description": "Ordered boron injection rate",
+          "minimum": 0,
+          "maximum": 50
+        },
+        "CHEM_BORON_DOSAGE_ACTUAL": {
+          "type": "number",
+          "description": "Actual boron injection rate",
+          "minimum": 0,
+          "maximum": 50
+        },
+        "CHEM_BORON_FILTER_ORDERED": {
+          "type": "number",
+          "description": "Ordered boron filtration rate",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "CHEM_BORON_FILTER_ACTUAL": {
+          "type": "number",
+          "description": "Actual boron filtration rate",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "CHEM_BORON_PPM": {
+          "type": "number",
+          "description": "Boron concentration in ppm",
+          "minimum": 0,
+          "maximum": 5400
+        },
+        "CHEMICAL_DOSING_PUMP_STATUS": {
+          "type": "integer",
+          "description": "Boron dosing pump state",
+          "oneOf": [
+                { "const": 0, "description": "Inactive" },
+                { "const": 1, "description": "Active - running up" },
+                { "const": 2, "description": "Active - speed reached" },
+                { "const": 3, "description": "Maintenance needed" },
+                { "const": 4, "description": "Not installed" },
+                { "const": 5, "description": "No energy" }
+            ]
+        },
+        "CHEMICAL_DOSING_PUMP_DRY_STATUS": {
+          "type": "integer",
+          "description": "Boron dosing pump dry state",
+          "oneOf": [
+                { "const": 1, "description": "Active without fluid" },
+                { "const": 4, "description": "Normal" }
+            ]
+        },
+        "CHEMICAL_DOSING_PUMP_OVERLOAD_STATUS": {
+          "type": "integer",
+          "description": "Boron dosing pump overload state",
+          "oneOf": [
+                { "const": 1, "description": "Overload" },
+                { "const": 4, "description": "Normal" }
+            ]
+        },
+        "CHEMICAL_FILTER_PUMP_STATUS": {
+          "type": "integer",
+          "description": "Boron filter pump state",
+          "oneOf": [
+                { "const": 0, "description": "Inactive" },
+                { "const": 1, "description": "Active - running up" },
+                { "const": 2, "description": "Active - speed reached" },
+                { "const": 3, "description": "Maintenance needed" },
+                { "const": 4, "description": "Not installed" },
+                { "const": 5, "description": "No energy" }
+            ]
+        },
+        "CHEMICAL_FILTER_PUMP_DRY_STATUS": {
+          "type": "integer",
+          "description": "Boron filter pump dry state",
+          "oneOf": [
+                { "const": 1, "description": "Active without fluid" },
+                { "const": 4, "description": "Normal" }
+            ]
+        },
+        "CHEMICAL_FILTER_PUMP_OVERLOAD_STATUS": {
+          "type": "integer",
+          "description": "Boron filter pump overload state",
+          "oneOf": [
+                { "const": 1, "description": "Overload" },
+                { "const": 4, "description": "Normal" }
+            ]
+        },
+        "CHEMICAL_CLEANING_PUMP_STATUS": {
+          "type": "integer",
+          "description": "Cleaning pump state",
+          "oneOf": [
+                { "const": 0, "description": "Inactive" },
+                { "const": 1, "description": "Active - running up" },
+                { "const": 2, "description": "Active - speed reached" },
+                { "const": 3, "description": "Maintenance needed" },
+                { "const": 4, "description": "Not installed" },
+                { "const": 5, "description": "No energy" }
+            ]
+        },
+        "CHEMICAL_CLEANING_PUMP_DRY_STATUS": {
+          "type": "integer",
+          "description": "Cleaning pump dry state",
+          "oneOf": [
+                { "const": 1, "description": "Active without fluid" },
+                { "const": 4, "description": "Normal" }
+            ]
+        },
+        "CHEMICAL_CLEANING_PUMP_OVERLOAD_STATUS": {
+          "type": "integer",
+          "description": "Cleaning pump overload state",
+          "oneOf": [
+                { "const": 1, "description": "Overload" },
+                { "const": 4, "description": "Normal" }
+            ]
+        }
+      }
+    },
+    "NUCLEAR_FUEL": {
+      "type": "object",
+      "properties": {
+        "CORE_FUEL_AVG_FISSIONABLE": {
+          "type": "number",
+          "description": "Average % of fissionable material remaining across all bays",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "CORE_FUEL_AVG_TEMPERATURE": {
+          "type": "number",
+          "description": "Average fuel temperature across all bays",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "CORE_FUEL_1_TEMPERATURE": {
+          "type": "number",
+          "description": "Fuel bay 1 temperature",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "CORE_FUEL_1_FISSIONABLE": {
+          "type": "number",
+          "description": "Fuel bay 1 % of fissionable material remaining",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "CORE_FUEL_1_POWER_FACTOR": {
+          "type": "number",
+          "description": "Fuel bay 1 power factor contribution",
+          "minimum": 0.0
+        },
+        "CORE_BAY_1_HATCH_OPEN": {
+          "type": "boolean",
+          "description": "Fuel bay 1 hatch state"
+        },
+        "CORE_FUEL_2_TEMPERATURE": {
+          "type": "number",
+          "description": "Fuel bay 2 temperature",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "CORE_FUEL_2_FISSIONABLE": {
+          "type": "number",
+          "description": "Fuel bay 2 % of fissionable material remaining",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "CORE_FUEL_2_POWER_FACTOR": {
+          "type": "number",
+          "description": "Fuel bay 2 power factor contribution",
+          "minimum": 0.0
+        },
+        "CORE_BAY_2_HATCH_OPEN": {
+          "type": "boolean",
+          "description": "Fuel bay 2 hatch state"
+        },
+        "CORE_FUEL_3_TEMPERATURE": {
+          "type": "number",
+          "description": "Fuel bay 3 temperature",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "CORE_FUEL_3_FISSIONABLE": {
+          "type": "number",
+          "description": "Fuel bay 3 % of fissionable material remaining",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "CORE_FUEL_3_POWER_FACTOR": {
+          "type": "number",
+          "description": "Fuel bay 3 power factor contribution",
+          "minimum": 0.0
+        },
+        "CORE_BAY_3_HATCH_OPEN": {
+          "type": "boolean",
+          "description": "Fuel bay 3 hatch state"
+        },
+        "CORE_FUEL_4_TEMPERATURE": {
+          "type": "number",
+          "description": "Fuel bay 4 temperature",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "CORE_FUEL_4_FISSIONABLE": {
+          "type": "number",
+          "description": "Fuel bay 4 % of fissionable material remaining",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "CORE_FUEL_4_POWER_FACTOR": {
+          "type": "number",
+          "description": "Fuel bay 4 power factor contribution",
+          "minimum": 0.0
+        },
+        "CORE_BAY_4_HATCH_OPEN": {
+          "type": "boolean",
+          "description": "Fuel bay 4 hatch state"
+        },
+        "CORE_FUEL_5_TEMPERATURE": {
+          "type": "number",
+          "description": "Fuel bay 5 temperature",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "CORE_FUEL_5_FISSIONABLE": {
+          "type": "number",
+          "description": "Fuel bay 5 % of fissionable material remaining",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "CORE_FUEL_5_POWER_FACTOR": {
+          "type": "number",
+          "description": "Fuel bay 5 power factor contribution",
+          "minimum": 0.0
+        },
+        "CORE_BAY_5_HATCH_OPEN": {
+          "type": "boolean",
+          "description": "Fuel bay 5 hatch state"
+        },
+        "CORE_FUEL_6_TEMPERATURE": {
+          "type": "number",
+          "description": "Fuel bay 6 temperature",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "CORE_FUEL_6_FISSIONABLE": {
+          "type": "number",
+          "description": "Fuel bay 6 % of fissionable material remaining",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "CORE_FUEL_6_POWER_FACTOR": {
+          "type": "number",
+          "description": "Fuel bay 6 power factor contribution",
+          "minimum": 0.0
+        },
+        "CORE_BAY_6_HATCH_OPEN": {
+          "type": "boolean",
+          "description": "Fuel bay 6 hatch state"
+        },
+        "CORE_FUEL_7_TEMPERATURE": {
+          "type": "number",
+          "description": "Fuel bay 7 temperature",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "CORE_FUEL_7_FISSIONABLE": {
+          "type": "number",
+          "description": "Fuel bay 7 % of fissionable material remaining",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "CORE_FUEL_7_POWER_FACTOR": {
+          "type": "number",
+          "description": "Fuel bay 7 power factor contribution",
+          "minimum": 0.0
+        },
+        "CORE_BAY_7_HATCH_OPEN": {
+          "type": "boolean",
+          "description": "Fuel bay 7 hatch state"
+        },
+        "CORE_FUEL_8_TEMPERATURE": {
+          "type": "number",
+          "description": "Fuel bay 8 temperature",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "CORE_FUEL_8_FISSIONABLE": {
+          "type": "number",
+          "description": "Fuel bay 8 % of fissionable material remaining",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "CORE_FUEL_8_POWER_FACTOR": {
+          "type": "number",
+          "description": "Fuel bay 8 power factor contribution",
+          "minimum": 0.0
+        },
+        "CORE_BAY_8_HATCH_OPEN": {
+          "type": "boolean",
+          "description": "Fuel bay 8 hatch state"
+        },
+        "CORE_FUEL_9_TEMPERATURE": {
+          "type": "number",
+          "description": "Fuel bay 9 temperature",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "CORE_FUEL_9_FISSIONABLE": {
+          "type": "number",
+          "description": "Fuel bay 9 % of fissionable material remaining",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "CORE_FUEL_9_POWER_FACTOR": {
+          "type": "number",
+          "description": "Fuel bay 9 power factor contribution",
+          "minimum": 0.0
+        },
+        "CORE_BAY_9_HATCH_OPEN": {
+          "type": "boolean",
+          "description": "Fuel bay 9 hatch state"
+        }
+      }
+    },
+    "TURBINES": {
+      "type": "object",
+      "properties": {
+        "GENERATOR_0_KW": {
+          "type": "number",
+          "description": "Generator 0 electrical output"
+        },
+        "GENERATOR_1_KW": {
+          "type": "number",
+          "description": "Generator 1 electrical output"
+        },
+        "GENERATOR_2_KW": {
+          "type": "number",
+          "description": "Generator 2 electrical output"
+        },
+        "GENERATOR_0_V": {
+          "type": "number",
+          "description": "Generator 0 output voltage"
+        },
+        "GENERATOR_1_V": {
+          "type": "number",
+          "description": "Generator 1 output voltage"
+        },
+        "GENERATOR_2_V": {
+          "type": "number",
+          "description": "Generator 2 output voltage"
+        },
+        "GENERATOR_0_A": {
+          "type": "number",
+          "description": "Generator 0 output current"
+        },
+        "GENERATOR_1_A": {
+          "type": "number",
+          "description": "Generator 1 output current"
+        },
+        "GENERATOR_2_A": {
+          "type": "number",
+          "description": "Generator 2 output current"
+        },
+        "GENERATOR_0_HERTZ": {
+          "type": "number",
+          "description": "Generator 0 frequency"
+        },
+        "GENERATOR_1_HERTZ": {
+          "type": "number",
+          "description": "Generator 1 frequency"
+        },
+        "GENERATOR_2_HERTZ": {
+          "type": "number",
+          "description": "Generator 2 frequency"
+        },
+        "GENERATOR_0_BREAKER": {
+          "type": "boolean",
+          "description": "Generator 0 breaker state",
+          "oneOf": [
+            { "const": false, "description": "Closed" },
+            { "const": true,  "description": "Open" }
+          ]
+        },
+        "GENERATOR_1_BREAKER": {
+          "type": "boolean",
+          "description": "Generator 1 breaker state",
+          "oneOf": [
+            { "const": false, "description": "Closed" },
+            { "const": true,  "description": "Open" }
+          ]
+        },
+        "GENERATOR_2_BREAKER": {
+          "type": "boolean",
+          "description": "Generator 2 breaker state",
+          "oneOf": [
+            { "const": false, "description": "Closed" },
+            { "const": true,  "description": "Open" }
+          ]
+        },
+        "MSCV_0_OPENING_ACTUAL": {
+          "type": "number",
+          "description": "Main steam control valve 0 actual opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "MSCV_1_OPENING_ACTUAL": {
+          "type": "number",
+          "description": "Main steam control valve 1 actual opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "MSCV_2_OPENING_ACTUAL": {
+          "type": "number",
+          "description": "Main steam control valve 2 actual opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "STEAM_TURBINE_0_RPM": {
+          "type": "number",
+          "description": "Turbine 0 speed"
+        },
+        "STEAM_TURBINE_1_RPM": {
+          "type": "number",
+          "description": "Turbine 1 speed"
+        },
+        "STEAM_TURBINE_2_RPM": {
+          "type": "number",
+          "description": "Turbine 2 speed"
+        },
+        "STEAM_TURBINE_0_PRESSURE": {
+          "type": "number",
+          "description": "Turbine 0 inlet steam pressure",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "STEAM_TURBINE_1_PRESSURE": {
+          "type": "number",
+          "description": "Turbine 1 inlet steam pressure",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "STEAM_TURBINE_2_PRESSURE": {
+          "type": "number",
+          "description": "Turbine 2 inlet steam pressure",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "STEAM_TURBINE_0_TEMPERATURE": {
+          "type": "number",
+          "description": "Turbine 0 inlet steam temperature",
+          "minimum": 0,
+          "maximum": 510
+        },
+        "STEAM_TURBINE_1_TEMPERATURE": {
+          "type": "number",
+          "description": "Turbine 1 inlet steam temperature",
+          "minimum": 0,
+          "maximum": 510
+        },
+        "STEAM_TURBINE_2_TEMPERATURE": {
+          "type": "number",
+          "description": "Turbine 2 inlet steam temperature",
+          "minimum": 0,
+          "maximum": 510
+        },
+        "STEAM_TURBINE_0_TORQUE": {
+          "type": "number",
+          "description": "Turbine 0 torque",
+          "minimum": 0,
+          "maximum": 200
+        },
+        "STEAM_TURBINE_1_TORQUE": {
+          "type": "number",
+          "description": "Turbine 1 torque",
+          "minimum": 0,
+          "maximum": 200
+        },
+        "STEAM_TURBINE_2_TORQUE": {
+          "type": "number",
+          "description": "Turbine 2 torque",
+          "minimum": 0,
+          "maximum": 200
+        },
+        "STEAM_TURBINE_0_INSTALLED": {
+          "type": "boolean",
+          "description": "Turbine 0 installed"
+        },
+        "STEAM_TURBINE_1_INSTALLED": {
+          "type": "boolean",
+          "description": "Turbine 1 installed"
+        },
+        "STEAM_TURBINE_2_INSTALLED": {
+          "type": "boolean",
+          "description": "Turbine 2 installed"
+        },
+        "STEAM_TURBINE_0_BYPASS_ACTUAL": {
+          "type": "number",
+          "description": "Turbine 0 bypass valve actual opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "STEAM_TURBINE_1_BYPASS_ACTUAL": {
+          "type": "number",
+          "description": "Turbine 1 bypass valve actual opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "STEAM_TURBINE_2_BYPASS_ACTUAL": {
+          "type": "number",
+          "description": "Turbine 2 bypass valve actual opening",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "STEAM_GENERATORS": {
+      "type": "object",
+      "properties": {
+        "STEAM_GEN_0_STATUS": {
+          "type": "integer",
+          "description": "Steam generator 0 state",
+          "oneOf": [
+                { "const": 2, "description": "Active" },
+                { "const": 4, "description": "Uninstalled" },
+                { "type": "integer", "description": "Unknown" }
+            ]
+        },
+        "STEAM_GEN_1_STATUS": {
+          "type": "integer",
+          "description": "Steam generator 1 state",
+          "oneOf": [
+                { "const": 2, "description": "Active" },
+                { "const": 4, "description": "Uninstalled" },
+                { "type": "integer", "description": "Unknown" }
+            ]
+        },
+        "STEAM_GEN_2_STATUS": {
+          "type": "integer",
+          "description": "Steam generator 2 state",
+          "oneOf": [
+                { "const": 2, "description": "Active" },
+                { "const": 4, "description": "Uninstalled" },
+                { "type": "integer", "description": "Unknown" }
+            ]
+        },
+        "STEAM_GEN_0_OUTLET": {
+          "type": "number",
+          "description": "SG0 steam outlet temperature",
+          "minimum": 0
+        },
+        "STEAM_GEN_0_EVAPORATED": {
+          "type": "number",
+          "description": "SG0 coolant evaporated to steam"
+        },
+        "STEAM_GEN_0_BOILING_POINT": {
+          "type": "number",
+          "description": "SG0 boiling point under pressure"
+        },
+        "STEAM_GEN_0_INLET": {
+          "type": "number",
+          "description": "SG0 coolant inlet temperature",
+          "minimum": 0
+        },
+        "STEAM_GEN_0_RETURN_FLOW_PLUS_CONDENSED": {
+          "type": "number",
+          "description": "SG0 return coolant flow + condensed return"
+        },
+        "STEAM_GEN_1_OUTLET": {
+          "type": "number",
+          "description": "SG1 steam outlet temperature",
+          "minimum": 0
+        },
+        "STEAM_GEN_1_EVAPORATED": {
+          "type": "number",
+          "description": "SG1 coolant evaporated to steam"
+        },
+        "STEAM_GEN_1_BOILING_POINT": {
+          "type": "number",
+          "description": "SG1 boiling point under pressure"
+        },
+        "STEAM_GEN_1_INLET": {
+          "type": "number",
+          "description": "SG1 coolant inlet temperature",
+          "minimum": 0
+        },
+        "STEAM_GEN_1_RETURN_FLOW_PLUS_CONDENSED": {
+          "type": "number",
+          "description": "SG1 return coolant flow + condensed return"
+        },
+        "STEAM_GEN_2_OUTLET": {
+          "type": "number",
+          "description": "SG2 steam outlet temperature",
+          "minimum": 0
+        },
+        "STEAM_GEN_2_EVAPORATED": {
+          "type": "number",
+          "description": "SG2 coolant evaporated to steam"
+        },
+        "STEAM_GEN_2_BOILING_POINT": {
+          "type": "number",
+          "description": "SG2 boiling point under pressure"
+        },
+        "STEAM_GEN_2_INLET": {
+          "type": "number",
+          "description": "SG2 coolant inlet temperature",
+          "minimum": 0
+        },
+        "STEAM_GEN_2_RETURN_FLOW_PLUS_CONDENSED": {
+          "type": "number",
+          "description": "SG2 return coolant flow + condensed return"
+        },
+        "STEAM_GEN_0_VENT_SWITCH": {
+          "type": "boolean",
+          "description": "SG0 vent valve switch"
+        },
+        "STEAM_GEN_1_VENT_SWITCH": {
+          "type": "boolean",
+          "description": "SG1 vent valve switch"
+        },
+        "STEAM_GEN_2_VENT_SWITCH": {
+          "type": "boolean",
+          "description": "SG2 vent valve switch"
+        }
+      }
+    },
+    "CONDENSER": {
+      "type": "object",
+      "properties": {
+        "CONDENSER_CIRCULATION_PUMP_SWITCH": {
+          "type": "boolean",
+          "description": "Circulation pump command"
+        },
+        "CONDENSER_CIRCULATION_PUMP_OVERLOAD_STATUS": {
+          "type": "boolean",
+          "description": "Circulation pump overload"
+        },
+        "CONDENSER_CIRCULATION_PUMP_SPEED": {
+          "type": "number",
+          "description": "Circulation pump actual speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "CONDENSER_CIRCULATION_PUMP_ORDERED_SPEED": {
+          "type": "number",
+          "description": "Circulation pump commanded speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "CONDENSER_TEMPERATURE": {
+          "type": "number",
+          "description": "Condenser water temperature",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "CONDENSER_VOLUME": {
+          "type": "number",
+          "description": "Total condenser volume",
+          "minimum": 0,
+          "maximum": 3600
+        },
+        "CONDENSER_VAPOR_VOLUME": {
+          "type": "number",
+          "description": "Steam vapor volume inside condenser"
+        },
+        "CONDENSER_CONDENSATE_FLOW_RATE": {
+          "type": "number",
+          "description": "Condensate outflow rate"
+        },
+        "CONDENSER_EXTRACTION_FLOW_RATE": {
+          "type": "number",
+          "description": "Extraction outflow rate"
+        },
+        "CONDENSER_COOLANT_EVAPORATED": {
+          "type": "number",
+          "description": "Coolant boiled off in condenser"
+        },
+        "CONDENSER_PRESSURE": {
+          "type": "number",
+          "description": "Internal condenser pressure"
+        },
+        "CONDENSER_CIRCULATION_PUMP_ACTIVE": {
+          "type": "boolean",
+          "description": "Circulation pump actual running state"
+        },
+        "CONDENSER_VACUUM": {
+          "type": "number",
+          "description": "Condenser vacuum level",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "CONDENSER_VACUUM_RELIEF_VALVE_OPENING": {
+          "type": "number",
+          "description": "Vacuum relief valve opening"
+        },
+        "CONDENSER_VACUUM_PUMP_ACTIVE": {
+          "type": "boolean",
+          "description": "Vacuum pump running state"
+        },
+        "CONDENSER_VACUUM_PUMP_MODE": {
+          "type": "string",
+          "description": "Vacuum pump mode",
+          "enum": [
+            "STARTUP",
+            "OPERATIONAL"
+          ]
+        },
+        "CONDENSER_VACUUM_PUMP_POWER": {
+          "type": "number",
+          "description": "Vacuum pump power setting"
+        },
+        "VACUUM_RETENTION_TANK_VOLUME": {
+          "type": "number",
+          "description": "Retention tank volume"
+        },
+        "VACUUM_RETENTION_TANK_PRESSURE": {
+          "type": "number",
+          "description": "Retention tank pressure"
+        },
+        "STEAM_EJECTOR_MOTIVE": {
+          "type": "number",
+          "description": "Steam ejector motive pressure"
+        },
+        "STEAM_EJECTOR_STARTUP_MOTIVE_VALVE_ORDERED": {
+          "type": "number",
+          "description": "Startup motive valve commanded opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "STEAM_EJECTOR_STARTUP_MOTIVE_VALVE_ACTUAL": {
+          "type": "number",
+          "description": "Startup motive valve actual opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "STEAM_EJECTOR_OPERATIONAL_MOTIVE_VALVE_ORDERED": {
+          "type": "number",
+          "description": "Operational motive valve commanded opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "STEAM_EJECTOR_OPERATIONAL_MOTIVE_VALVE_ACTUAL": {
+          "type": "number",
+          "description": "Operational motive valve actual opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "STEAM_EJECTOR_CONDENSER_RETURN_VALVE_ORDERED": {
+          "type": "number",
+          "description": "Condenser return valve commanded opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "STEAM_EJECTOR_CONDENSER_RETURN_VALVE_ACTUAL": {
+          "type": "number",
+          "description": "Condenser return valve actual opening",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "RESISTORS": {
+      "type": "object",
+      "properties": {
+        "RES_DIVERT_SURPLUS_FROM_MW": {
+          "type": "number",
+          "description": "Power diverted to resistors from plant surplus",
+          "minimum": 0,
+          "maximum": 50
+        },
+        "RES_EFFECTIVELY_DERIVED_ENERGY_MW": {
+          "type": "number",
+          "description": "Actual absorbed energy by resistor banks"
+        },
+        "RES_ABSORPTION_CAPACITY_MW": {
+          "type": "number",
+          "description": "Maximum absorption capacity of all resistor banks",
+          "minimum": 0,
+          "maximum": 360
+        },
+        "RESISTOR_BANK_01_SWITCH": {
+          "type": "boolean",
+          "description": "Resistor bank 01 switch state"
+        },
+        "RESISTOR_BANK_02_SWITCH": {
+          "type": "boolean",
+          "description": "Resistor bank 02 switch state"
+        },
+        "RESISTOR_BANK_03_SWITCH": {
+          "type": "boolean",
+          "description": "Resistor bank 03 switch state"
+        },
+        "RESISTOR_BANK_04_SWITCH": {
+          "type": "boolean",
+          "description": "Resistor bank 04 switch state"
+        },
+        "RESISTOR_BANKS_MAIN_SWITCH": {
+          "type": "boolean",
+          "description": "Master switch for resistor banks"
+        },
+        "RESISTOR_BANKS_JSON": {
+          "type": "object",
+          "description": "JSON with resistor details"
+        }
+      }
+    },
+    "COOLANT_PRIMARY": {
+      "type": "object",
+      "properties": {
+        "COOLANT_CORE_STATE": {
+          "type": "integer",
+          "description": "Core state",
+          "oneOf": [
+                { "const": 0, "description": "Inactive" },
+                { "const": 1, "description": "Active" },
+                { "type": "integer", "description": "Fault" }
+              ]
+        },
+        "COOLANT_CORE_VESSEL_TEMPERATURE": {
+          "type": "number",
+          "description": "Core vessel coolant temperature",
+          "minimum": 0,
+          "maximum": 700
+        },
+        "COOLANT_CORE_QUANTITY_IN_VESSEL": {
+          "type": "number",
+          "description": "Coolant volume inside core vessel"
+        },
+        "COOLANT_CORE_PRIMARY_LOOP_LEVEL": {
+          "type": "number",
+          "description": "Coolant fill level in primary loop",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_CORE_FLOW_IN": {
+          "type": "number",
+          "description": "Coolant inflow into core",
+          "minimum": 0
+        },
+        "COOLANT_CORE_FLOW_OUT": {
+          "type": "number",
+          "description": "Coolant outflow from core",
+          "minimum": 0
+        },
+        "COOLANT_CORE_FLOW_SPEED": {
+          "type": "number",
+          "description": "Average circulation speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_CORE_FLOW_ORDERED_SPEED": {
+          "type": "number",
+          "description": "Commanded circulation speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_CORE_FLOW_REACHED_SPEED": {
+          "type": "boolean",
+          "description": "Flow reached commanded speed"
+        },
+        "COOLANT_CORE_QUANTITY_CIRCULATION_PUMPS_PRESENT": {
+          "type": "integer",
+          "description": "Number of circulation pumps installed",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "COOLANT_CORE_QUANTITY_FREIGHT_PUMPS_PRESENT": {
+          "type": "integer",
+          "description": "Number of freight pumps connected",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_0_STATUS": {
+          "type": "integer",
+          "description": "Pump 0 state",
+          "oneOf": [
+                { "const": 0, "description": "Inactive" },
+                { "const": 1, "description": "Active - running up" },
+                { "const": 2, "description": "Active - speed reached" },
+                { "const": 3, "description": "Maintenance needed" },
+                { "const": 4, "description": "Not installed" },
+                { "const": 5, "description": "No energy" }
+            ]
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_1_STATUS": {
+          "type": "integer",
+          "description": "Pump 1 state",
+          "oneOf": [
+                { "const": 0, "description": "Inactive" },
+                { "const": 1, "description": "Active - running up" },
+                { "const": 2, "description": "Active - speed reached" },
+                { "const": 3, "description": "Maintenance needed" },
+                { "const": 4, "description": "Not installed" },
+                { "const": 5, "description": "No energy" }
+            ]
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_2_STATUS": {
+          "type": "integer",
+          "description": "Pump 2 state",
+          "oneOf": [
+                { "const": 0, "description": "Inactive" },
+                { "const": 1, "description": "Active - running up" },
+                { "const": 2, "description": "Active - speed reached" },
+                { "const": 3, "description": "Maintenance needed" },
+                { "const": 4, "description": "Not installed" }
+          ]
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_0_DRY_STATUS": {
+          "type": "integer",
+          "description": "Pump 0 dry state",
+          "oneOf": [
+            { "const": 1, "description": "Active without fluid" },
+            { "const": 4, "description": "Normal" }
+          ]
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_1_DRY_STATUS": {
+          "type": "integer",
+          "description": "Pump 1 dry state",
+          "oneOf": [
+            { "const": 1, "description": "Active without fluid" },
+            { "const": 4, "description": "Normal" }
+          ]
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_2_DRY_STATUS": {
+          "type": "integer",
+          "description": "Pump 2 dry state",
+          "oneOf": [
+            { "const": 1, "description": "Active without fluid" },
+            { "const": 4, "description": "Normal" }
+          ]
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_0_OVERLOAD_STATUS": {
+          "type": "integer",
+          "description": "Pump 0 overload state",
+          "oneOf": [
+            { "const": 1, "description": "Overloaded" },
+            { "const": 4, "description": "Normal" }
+          ]
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_1_OVERLOAD_STATUS": {
+          "type": "integer",
+          "description": "Pump 1 overload state",
+          "oneOf": [
+            { "const": 1, "description": "Overloaded" },
+            { "const": 4, "description": "Normal" }
+          ]
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_2_OVERLOAD_STATUS": {
+          "type": "integer",
+          "description": "Pump 2 overload state",
+          "oneOf": [
+            { "const": 1, "description": "Overloaded" },
+            { "const": 4, "description": "Normal" }
+          ]
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_0_ORDERED_SPEED": {
+          "type": "number",
+          "description": "Pump 0 commanded speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_1_ORDERED_SPEED": {
+          "type": "number",
+          "description": "Pump 1 commanded speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_2_ORDERED_SPEED": {
+          "type": "number",
+          "description": "Pump 2 commanded speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_0_SPEED": {
+          "type": "number",
+          "description": "Pump 0 actual speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_1_SPEED": {
+          "type": "number",
+          "description": "Pump 1 actual speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_CORE_CIRCULATION_PUMP_2_SPEED": {
+          "type": "number",
+          "description": "Pump 2 actual speed",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "COOLANT_SECONDARY": {
+      "type": "object",
+      "properties": {
+        "COOLANT_SEC_CIRCULATION_PUMP_0_STATUS": {
+          "type": "integer",
+          "description": "Pump 0 state",
+          "oneOf": [
+            { "const": 0, "description": "Inactive" },
+            { "const": 1, "description": "Active - running up" },
+            { "const": 2, "description": "Active - speed reached" },
+            { "const": 3, "description": "Maintenance needed" },
+            { "const": 4, "description": "Not installed" },
+            { "const": 5, "description": "No energy" }
+          ]
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_1_STATUS": {
+          "type": "integer",
+          "description": "Pump 1 state",
+          "oneOf": [
+            { "const": 0, "description": "Inactive" },
+            { "const": 1, "description": "Active - running up" },
+            { "const": 2, "description": "Active - speed reached" },
+            { "const": 3, "description": "Maintenance needed" },
+            { "const": 4, "description": "Not installed" }
+          ]
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_2_STATUS": {
+          "type": "integer",
+          "description": "Pump 2 state",
+          "oneOf": [
+            { "const": 0, "description": "Inactive" },
+            { "const": 1, "description": "Active - running up" },
+            { "const": 2, "description": "Active - speed reached" },
+            { "const": 3, "description": "Maintenance needed" },
+            { "const": 4, "description": "Not installed" },
+            { "const": 5, "description": "No energy" }
+          ]
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_0_DRY_STATUS": {
+          "type": "integer",
+          "description": "Pump 0 dry state",
+          "oneOf": [
+            { "const": 1, "description": "Active without fluid" },
+            { "const": 4, "description": "Normal" }
+          ]
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_1_DRY_STATUS": {
+          "type": "integer",
+          "description": "Pump 1 dry state",
+          "oneOf": [
+            { "const": 1, "description": "Active without fluid" },
+            { "const": 4, "description": "Normal" }
+          ]
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_2_DRY_STATUS": {
+          "type": "integer",
+          "description": "Pump 2 dry state",
+          "oneOf": [
+            { "const": 1, "description": "Active without fluid" },
+            { "const": 4, "description": "Normal" }
+          ]
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_0_OVERLOAD_STATUS": {
+          "type": "integer",
+          "description": "Pump 0 overload state",
+          "oneOf": [
+            { "const": 1, "description": "Overloaded" },
+            { "const": 4, "description": "Normal" }
+          ]
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_1_OVERLOAD_STATUS": {
+          "type": "integer",
+          "description": "Pump 1 overload state",
+          "oneOf": [
+            { "const": 1, "description": "Overloaded" },
+            { "const": 4, "description": "Normal" }
+          ]
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_2_OVERLOAD_STATUS": {
+          "type": "integer",
+          "description": "Pump 2 overload state",
+          "oneOf": [
+            { "const": 1, "description": "Overloaded" },
+            { "const": 4, "description": "Normal" }
+          ]
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_0_ORDERED_SPEED": {
+          "type": "number",
+          "description": "Pump 0 commanded speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_1_ORDERED_SPEED": {
+          "type": "number",
+          "description": "Pump 1 commanded speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_2_ORDERED_SPEED": {
+          "type": "number",
+          "description": "Pump 2 commanded speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_0_SPEED": {
+          "type": "number",
+          "description": "Pump 0 actual speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_1_SPEED": {
+          "type": "number",
+          "description": "Pump 1 actual speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_SEC_CIRCULATION_PUMP_2_SPEED": {
+          "type": "number",
+          "description": "Pump 2 actual speed",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "COOLANT_SEC_0_VOLUME": {
+          "type": "number",
+          "description": "Total volume of water+steam in secondary loop 0",
+          "minimum": 0,
+          "maximum": 60000
+        },
+        "COOLANT_SEC_1_VOLUME": {
+          "type": "number",
+          "description": "Total volume of water+steam in secondary loop 1",
+          "minimum": 0,
+          "maximum": 60000
+        },
+        "COOLANT_SEC_2_VOLUME": {
+          "type": "number",
+          "description": "Total volume of water+steam in secondary loop 2",
+          "minimum": 0,
+          "maximum": 60000
+        },
+        "COOLANT_SEC_0_LIQUID_VOLUME": {
+          "type": "number",
+          "description": "Liquid water in loop 0",
+          "minimum": 0,
+          "maximum": 60000
+        },
+        "COOLANT_SEC_1_LIQUID_VOLUME": {
+          "type": "number",
+          "description": "Liquid water in loop 1",
+          "minimum": 0,
+          "maximum": 60000
+        },
+        "COOLANT_SEC_2_LIQUID_VOLUME": {
+          "type": "number",
+          "description": "Liquid water in loop 2",
+          "minimum": 0,
+          "maximum": 60000
+        },
+        "COOLANT_SEC_0_PRESSURE": {
+          "type": "number",
+          "description": "Pressure in loop 0",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "COOLANT_SEC_1_PRESSURE": {
+          "type": "number",
+          "description": "Pressure in loop 1",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "COOLANT_SEC_2_PRESSURE": {
+          "type": "number",
+          "description": "Pressure in loop 2",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "COOLANT_SEC_0_TEMPERATURE": {
+          "type": "number",
+          "description": "Coolant temperature in loop 0",
+          "minimum": 0,
+          "maximum": 800
+        },
+        "COOLANT_SEC_1_TEMPERATURE": {
+          "type": "number",
+          "description": "Coolant temperature in loop 1",
+          "minimum": 0,
+          "maximum": 800
+        },
+        "COOLANT_SEC_2_TEMPERATURE": {
+          "type": "number",
+          "description": "Coolant temperature in loop 2",
+          "minimum": 0,
+          "maximum": 800
+        }
+      }
+    },
+    "COOLANT_MISC": {
+      "type": "object",
+      "properties": {
+        "CORE_POOL_COOLANT_TANK_VOLUME": {
+          "type": "number",
+          "description": "Core pool coolant volume",
+          "maximum": 80000
+        },
+        "CORE_PRIMARY_CIRCUIT_COOLING_TANK_VOLUME": {
+          "type": "number",
+          "description": "Primary circuit reserve cooling tank volume",
+          "maximum": 150000
+        },
+        "CORE_EXTERNAL_COOLANT_RESERVOIR_VOLUME": {
+          "type": "number",
+          "description": "External reserve coolant reservoir",
+          "maximum": 500000
+        },
+        "VALVE_M01_OPEN": {
+          "type": "integer",
+          "description": "Valve M01 opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "VALVE_M02_OPEN": {
+          "type": "integer",
+          "description": "Valve M02 opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "VALVE_M03_OPEN": {
+          "type": "integer",
+          "description": "Valve M03 opening",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "CORE_POOL_PUMP": {
+          "type": "integer",
+          "description": "Core pool pump state",
+          "oneOf": [
+            { "const": 1, "description": "Unload" },
+            { "const": 2, "description": "Inactive" },
+            { "const": 3, "description": "Load" },
+            { "const": 5, "description": "Unknown" }
+          ]
+        },
+        "FREIGHT_PUMP_CONDENSER_SWITCH": {
+          "type": "boolean",
+          "description": "Command for freight pump loading water into condenser"
+        },
+        "FREIGHT_PUMP_INTERNAL_SWITCH": {
+          "type": "boolean",
+          "description": "Command for internal primary (freight) pump"
+        },
+        "FREIGHT_PUMP_EXTERNAL_SWITCH": {
+          "type": "boolean",
+          "description": "Command for freight pump loading water into external reservoir"
+        },
+        "FREIGHT_PUMP_FEEDWATER_SWITCH": {
+          "type": "boolean",
+          "description": "Command for freight pump loading water into the core"
+        },
+        "FREIGHT_PUMP_CONDENSER_ACTIVE": {
+          "type": "boolean",
+          "description": "Actual state of freight pump condenser"
+        },
+        "FREIGHT_PUMP_INTERNAL_ACTIVE": {
+          "type": "boolean",
+          "description": "Actual state of freight pump internal"
+        },
+        "FREIGHT_PUMP_EXTERNAL_ACTIVE": {
+          "type": "boolean",
+          "description": "Actual state of freight pump external"
+        },
+        "FREIGHT_PUMP_FEEDWATER_ACTIVE": {
+          "type": "boolean",
+          "description": "Actual state of freight pump feedwater"
+        }
+      }
+    },
+    "CORE": {
+      "type": "object",
+      "properties": {
+        "ALARMS_ACTIVE": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Active alarms in core"
+        },
+        "CORE_TEMP": {
+          "type": "number",
+          "description": "Internal temperature",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "CORE_TEMP_RESIDUAL": {
+          "type": "boolean",
+          "description": "Decay heat indicator after shutdown"
+        },
+        "CORE_PRESSURE": {
+          "type": "number",
+          "description": "Primary loop pressure",
+          "minimum": 0,
+          "maximum": 320
+        },
+        "CORE_INTEGRITY": {
+          "type": "number",
+          "description": "Structural integrity of reactor vessel",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "CORE_WEAR": {
+          "type": "number",
+          "description": "Accumulated operational degradation",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "CORE_STATE": {
+          "type": "integer",
+          "description": "Reactor physical state"
+        },
+        "CORE_STATE_CRITICALITY": {
+          "type": "number",
+          "description": "Reactivity indicator"
+        },
+        "CORE_CRITICAL_MASS_REACHED": {
+          "type": "boolean",
+          "description": "Whether chain reaction initiated"
+        },
+        "CORE_CRITICAL_MASS_REACHED_COUNTER": {
+          "type": "integer",
+          "description": "Number of times critical mass reached"
+        },
+        "CORE_IMMINENT_FUSION": {
+          "type": "boolean",
+          "description": "Emergency runaway/fusion flag"
+        },
+        "CORE_READY_FOR_START": {
+          "type": "boolean",
+          "description": "Is the reactor ready for startup"
+        },
+        "CORE_STEAM_PRESENT": {
+          "type": "boolean",
+          "description": "Steam detected in primary loop"
+        },
+        "CORE_HIGH_STEAM_PRESENT": {
+          "type": "boolean",
+          "description": "Critical steam detected in primary loop"
+        },
+        "CORE_FACTOR": {
+          "type": "number",
+          "description": "Reactor output scaling factor"
+        },
+        "CORE_FACTOR_CHANGE": {
+          "type": "number",
+          "description": "Rate of change of CORE_FACTOR"
+        },
+        "CORE_OPERATION_MODE": {
+          "type": "integer",
+          "description": "Reactor operating mode",
+          "oneOf": [
+            { "const": 0, "description": "Shutdown" },
+            { "const": 1, "description": "Nominal" },
+            { "const": 2, "description": "Maximum" }
+          ]
+        },
+        "CORE_IODINE_GENERATION": {
+          "type": "number",
+          "description": "Iodine-131 production rate"
+        },
+        "CORE_IODINE_CUMULATIVE": {
+          "type": "number",
+          "description": "Iodine-131 concentration",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "CORE_XENON_GENERATION": {
+          "type": "number",
+          "description": "Xenon-135 production rate"
+        },
+        "CORE_XENON_CUMULATIVE": {
+          "type": "number",
+          "description": "Xenon-135 concentration",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "MAINTENANCE": {
+      "type": "object",
+      "properties": {
+        "MAINTENANCE_REPORT_HTML": {
+          "type": "string",
+          "description": "HTML formatted maintenance report"
+        }
+      }
+    }
+  }
+}
