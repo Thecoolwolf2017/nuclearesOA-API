@@ -3,11 +3,10 @@
 This project provides an API backend and client for connecting the game **Nucleares** with a GPT-powered “Operating Assistant.”  
 It collects live telemetry data from the in-game plant webserver, forwards it to a cloud API (Render), and makes it accessible to GPT agents for reasoning and operator guidance.
 
+A stripped version of the assistant, without API capabilities can be found [HERE](https://chatgpt.com/g/g-68c7033fc76c819184cb9d619d5908fc-nucleares-oa)
+
 ## How it works
-1. Start the webserver in game (`http://localhost:8785`).  
-2. Run the client (`sender.py`), which routes all telemetry to the cloud API.  
-3. The GPT Operating Assistant calls the API via `/api/state` to read the latest plant conditions.  
-4. GPT uses both the manuals and the live state to answer operator questions and guide gameplay.
+The GPT is fed data stored in `GPT/documentation`. It uses this data to help and guide the user in operating the in-game Nuclear Power Plant. A private copy of this GPT can be made by OpenAI Plus members, with the capability to query the game’s WebServer through the API. A guide describing the process, as well as example use cases, can be viewed in the GPT catalog. The API receives data from the sender script running locally, which routes it from the local webserver to a public one. The server uses a JSON schema to group and translate the data into a GPT-readable form, accessible through a public URL.
 
 ## Deployment
 The server is designed to run on [Render](https://render.com).  
