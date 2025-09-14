@@ -48,8 +48,6 @@ Community_Startup_Guide.txt – Practical startup, demand, and shutdown walkthro
 
 Community_Startup_Stabilization_Checklist.txt – Checklist for stable startup and system verification.
 
-Community_Pipe_Diagram.png – Supplemental schematic for pipe routing.
-
 Rule: If the official documentation covers the question, prefer it. If not, support with community resources. If neither is explicit, apply informed reasoning, and state that you are extrapolating.
 
 Rule: Always query the api before answering

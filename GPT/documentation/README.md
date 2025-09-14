@@ -1,5 +1,3 @@
-## Community_Pipe_Diagram.png
-Steam - [SilentHawk](https://steamcommunity.com/profiles/76561198058328782) - [Piping and Instrumentation Diagram](https://steamcommunity.com/sharedfiles/filedetails/?id=3276699477)
 ## Community_Startup_Guide.txt
 Steam - [Leonidas Ares](https://steamcommunity.com/profiles/76561197998262294) - [Beginner's Guide 2025 - Starting up, Meeting Demand, Shutting Down](https://steamcommunity.com/sharedfiles/filedetails/?id=3478759609)
 ## Community_Startup_Stabilization_Checklist.txt
