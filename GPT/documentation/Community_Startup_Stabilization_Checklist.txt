@@ -1,0 +1,99 @@
+INTERNAL SUPPLY
+  EXTERNAL POWER SUPPLY .................................. ON
+  GENERATOR 01 MODE ...................................... MANUAL
+  GENERATOR 01 SWITCH .................................... OFF
+
+MASTER CONSOLE
+  CONDENSER SWITCH ....................................... ON
+  STEAM GENERATOR SWITCH ................................. ON
+  ENERGY GENERATION SWITCH ............................... ON
+  COOLANT SYSTEM SWITCH .................................. ON
+  REACTOR CORE SWITCH (1) ................................ ON
+  REACTOR CORE SWITCH (2) ................................ ON
+  PRESSURIZER SWITCH ..................................... ON
+  FUEL SWITCH ............................................ ON
+
+PRESSURIZER
+  THERMOSTAT ............................................. ON
+  HEATING POWER .......................................... ON
+  HEATING POWER LEVEL .................................... SET TO HIGH
+  PRESSURE GAUGE ......................................... MONITOR UNTIL 150 BAR
+
+COOLANT SYSTEM
+  CIRCULATION PUMP 03 .................................... START
+  FLOW SPEED BUTTON ...................................... MEDIUM PRESSED
+  ORDERED SPEED DIAL ..................................... SET TO 50%
+  CIRCULATION PUMP SPEED ................................. MONITOR UNTIL STABLE
+
+CONDENSER
+  COOLING CIRCUIT COOLANT FLOW SPEED ..................... START
+  FLOW SPEED BUTTON ...................................... MEDIUM PRESSED
+  ORDERED SPEED DIAL ..................................... SET TO 50%
+  FLOW SPEED ............................................. MONITOR UNTIL STABLE
+
+ENERGY GENERATION
+  TURBINES BYPASS VALVE 03 ............................... SET TO 100% (OPEN)
+
+CONDENSER  
+  STEAM JET EJECTOR – STARTUP MOTIVE STEAM INLET VALVE  
+    VALVE POSITION ............................ SET TO 100%  
+    CONDENSATE RETURN VALVE ................... CONFIRM FULLY CLOSED  
+    SMSI VALVE POSITION ....................... MONITOR UNTIL FULLY OPEN  
+
+ENERGY GENERATION
+  TURBINES BYPASS VALVE 03 ............................... MONITOR UNTIL FULLY OPEN
+
+COMMS CENTER
+  START OPERATIONS REQUEST ............................... TRANSMIT
+  RESPONSE ............................................... WAIT FOR PERMISSION
+
+ENERGY GENERATION
+  RESISTOR BANK SWITCH 01 ................................ ON
+
+FUEL
+  OPERATION MODE ......................................... SET TO NOMINAL
+  LOAD FUEL .............................................. PRESS
+  FUEL TEMPERATURE GAUGE ................................. CONFIRM ACTIVE
+
+REACTOR CORE
+  ROD HEIGHT ............................................. SET TO 93%
+  CHAIN REACTION ......................................... MONITOR
+  STATUS ................................................. WAIT FOR CRITICAL MASS
+
+STEAM GENERATION  
+  GENERATOR 03 – PRESSURE ..................... MONITOR  
+  GENERATOR 03 – TEMPERATURE ................. MONITOR  
+  CONDITION – PRESSURE ≥ 10 BAR .............. CONTINUE  
+
+  SECONDARY CIRCUIT COOLANT FLOW SPEED  
+    FLOW SPEED BUTTON ........................ MEDIUM PRESSED  
+    CIRCULATION PUMP 03 ...................... START  
+    ORDERED SPEED DIAL ....................... SET TO 50%  
+    FLOW SPEED ............................... MONITOR UNTIL STABLE  
+
+CONDENSER
+  VACUUM PUMP ............................................ ON (WHEN RETENTION TANK ≥ 50%)
+  CONDENSER PRESSURE ..................................... MONITOR UNTIL ~0.1 BAR
+
+ENERGY GENERATION
+  TURBINES BYPASS VALVE 03 ............................... SET TO 0% (CLOSED)
+
+CONDENSER
+  STEAM JET EJECTOR – STARTUP MOTIVE STEAM INLET VALVE ... VALVE POSITION SET TO 0% (CLOSED)
+  STEAM JET EJECTOR – OPERATIONAL MOTIVE STEAM INLET VALVE ... VALVE POSITION SET TO 30%
+  VACUUM PUMP MODE ....................................... SET TO OPERATIONAL
+
+ENERGY GENERATION
+  GENERATOR 03 – RPM ..................................... MONITOR UNTIL ~3050 RPM
+  RPM CONTROL – RAISE BUTTON ............................. PRESS TO BEGIN SYNCHRONIZATION
+  SYNCHROSCOPE LIGHT ..................................... OBSERVE UNTIL LIGHT STOPS AT ZERO
+  RPM CONTROL – RAISE / LOWER ............................ ADJUST TO HOLD ZERO POSITION
+  SYNCHRONIZATION INDICATORS ............................. CONFIRM BOTH GREEN LIGHTS OFF
+  GENERATOR 03 – VOLTAGE & FREQUENCY ..................... COMPARE TO BUS V / Hz
+  SYNCHRONIZATION STATUS ................................. CONFIRM MATCHED (±1V / ±1Hz)
+  CIRCUIT BREAKER ........................................ CLOSE
+
+STATUS
+  REACTOR POWER .......................................... STABLE
+  GRID CONNECTION ........................................ ESTABLISHED
+  OPERATIONAL MODE ....................................... ACTIVE – NOMINAL
