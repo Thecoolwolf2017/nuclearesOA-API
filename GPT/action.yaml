@@ -4,7 +4,7 @@ info:
   description: Accesses real-time state data for reactor subsystems such as core, power, coolant, turbines, and more. Use the `data` field to interpret the system state and respond accordingly. Use `last_updated` to assess data freshness or flag stale information.
   version: 1.0.0
 servers:
-  - url: https://nuclearesoa-api.onrender.com/api
+  - url: https://your-api-url.onrender.com/api
     description: Production server
 paths:
 
