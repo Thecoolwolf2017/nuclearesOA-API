@@ -1,5 +1,5 @@
 from fastapi  import FastAPI, Request, HTTPException
-from typing   import Dict
+from typing   import Dict, List
 
 import os, sys, hmac, hashlib, json
 
@@ -35,26 +35,52 @@ async def update_state(request: Request):
 with open("variables.json", "r", encoding="utf-8") as f:
     SCHEMA = json.load(f)["properties"]
 
-GROUPS: Dict[str, list] = {
+GROUPS: Dict[str, List[str]] = {
     group_name: list(group_def.get("properties", {}).keys())
     for group_name, group_def in SCHEMA.items()
 }
 
-@app.get("/api/state/{group}")
-async def get_state_group(group: str):
+VAR_TO_GROUP: Dict[str, str] = {}
+for group_name, variables in GROUPS.items():
+    for variable in variables:
+        VAR_TO_GROUP[variable.upper()] = group_name
+
+@app.get("/api/state/{identifier}")
+async def get_state_group(identifier: str):
     global current_state, last_updated
 
-    vars_in_group = GROUPS.get(group.upper())
-    if not vars_in_group:
-        raise HTTPException(status_code=404, detail=f"No group '{group}' defined")
+    lookup_key = identifier.upper()
+
+    vars_in_group = GROUPS.get(lookup_key)
+    if vars_in_group is not None:
+        target_group = lookup_key
+        vars_to_fetch = vars_in_group
+        is_variable_lookup = False
+    else:
+        target_group = VAR_TO_GROUP.get(lookup_key)
+        if not target_group:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No group or variable '{identifier}' defined",
+            )
+        vars_to_fetch = [lookup_key]
+        is_variable_lookup = True
 
     selected = {}
-    for k in vars_in_group:
+    for k in vars_to_fetch:
         if k in current_state:
-            selected[k] = _translate_value(group.upper(), k, current_state[k])
+            selected[k] = _translate_value(target_group, k, current_state[k])
 
     if not selected:
-        raise HTTPException(status_code=404, detail=f"No variables found for group '{group}'")
+        if is_variable_lookup:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Variable '{identifier}' not found in current state",
+            )
+        raise HTTPException(
+            status_code=404,
+            detail=f"No variables found for group '{identifier}'",
+        )
 
     return {"last_updated": last_updated, "data": selected}
 
