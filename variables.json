@@ -1642,7 +1642,7 @@
         }
       }
     },
-    "MAINTENANCE": {
+    "MAINTENANCE_REPORT_HTML": {
       "type": "object",
       "properties": {
         "MAINTENANCE_REPORT_HTML": {
