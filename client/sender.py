@@ -3,6 +3,7 @@ import hmac
 import time
 import hashlib
 import requests
+from urllib.parse import urljoin
 from datetime import datetime, timezone
 
 # Load config
@@ -13,7 +14,7 @@ API_URL = config['API_URL']
 API_KEY = config['API_KEY'].encode()
 
 # Game webserver endpoint
-GAME_URL = config['GAME_URL'] + '/?Variable=WEBSERVER_BATCH_GET&value=*'
+GAME_URL = urljoin(config['GAME_URL'].rstrip('/') + '/', '?Variable=WEBSERVER_BATCH_GET&value=*')
 POLL_INTERVAL = config.get('POLL_INTERVAL', 5)
 
 
@@ -40,9 +41,15 @@ while True:
 
     try:
         resp = requests.get(GAME_URL, timeout=10)
-        resp.raise_for_status()
+        status = resp.status_code
+        if status >= 400:
+            print(f'WARN[{status}] ', end='')
 
-        raw_data = resp.json()
+        try:
+            raw_data = resp.json()
+        except ValueError as exc:
+            snippet = resp.text[:200].replace('\n', ' ')
+            raise ValueError(f'Unexpected payload (status {status}): {snippet}') from exc
         game_values = raw_data.get('values', {})
         if not isinstance(game_values, dict):
             raise ValueError('Unexpected payload structure from game webserver')
