@@ -1,9 +1,9 @@
 {
-  "API_URL": "https://your-api-url.onrender.com/api/state",
-  "API_KEY": "changeme--key",
+  "API_URL": "https://your-render-service.onrender.com/api/state",
+  "API_KEY": "replace-with-api-key",
   "GAME_URL": "http://localhost:8785/",
-  "COMMAND_URL": "https://your-api-url.onrender.com/api/commands",
-  "COMMAND_TOKEN": "changeme-command-token",
+  "COMMAND_URL": "https://your-render-service.onrender.com/api/commands",
+  "COMMAND_TOKEN": "replace-with-command-token",
   "COMMAND_POLL_LIMIT": 3,
   "COMMAND_TIMEOUT": 10,
   "CLIENT_ID": "local-sender"

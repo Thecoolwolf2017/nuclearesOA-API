@@ -7,7 +7,7 @@ info:
     queue commands cautiously and monitor their execution status.
   version: 3.0.0
 servers:
-  - url: https://nuclearesoa-api-936z.onrender.com/api
+  - url: https://your-render-service.onrender.com/api
     description: Production server
 paths:
   /groups:

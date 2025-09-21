@@ -424,7 +424,6 @@ async def create_command(
     request: CreateCommandRequest,
     command_token: str | None = Header(default=None, alias="X-Command-Token"),
 ):
-    print("Command token header:", command_token, flush=True)
     _verify_command_token(command_token)
 
     command_id = uuid4().hex
