@@ -1,13 +1,20 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Header, HTTPException, Request
 from typing import Any, Dict, List
 
+import asyncio
+import hashlib
+import hmac
+import json
 import os
 import sys
-import hmac
-import hashlib
-import json
+from datetime import datetime, timezone
+from itertools import count
+from uuid import uuid4
+
+from pydantic import BaseModel, Field, validator
 
 API_KEY = os.getenv("API_KEY", "changeme").encode()
+COMMAND_TOKEN = os.getenv("COMMAND_TOKEN", "changeme")
 app = FastAPI()
 
 current_state: Dict[str, Any] = {}
@@ -16,6 +23,12 @@ last_updated: str | None = None  # ISO 8601 string
 if API_KEY == b"changeme":
     print(
         "WARNING: API_KEY is set to default 'changeme'. Please configure it in Render environment variables.",
+        file=sys.stderr,
+    )
+
+if COMMAND_TOKEN == "changeme":
+    print(
+        "WARNING: COMMAND_TOKEN is set to default 'changeme'. Please configure it in Render environment variables.",
         file=sys.stderr,
     )
 
@@ -32,6 +45,98 @@ VAR_TO_GROUP: Dict[str, str] = {
     for group, variables in GROUPS.items()
     for var in variables
 }
+
+command_lock = asyncio.Lock()
+command_store: Dict[str, Dict[str, Any]] = {}
+command_sequence = count()
+COMMAND_HISTORY_LIMIT = 250
+
+
+class CommandTask(BaseModel):
+    operation: str = Field(
+        default="set",
+        description="Operation to perform against the simulator webserver (set or pulse).",
+    )
+    variable: str = Field(
+        ..., min_length=1, description="Webserver variable name targeted by this step."
+    )
+    value: Any = Field(..., description="Value to apply for the operation.")
+    reset_value: Any | None = Field(
+        default=None,
+        description="Value to apply after hold_seconds when operation is 'pulse'.",
+    )
+    hold_seconds: float = Field(
+        default=1.0,
+        ge=0.0,
+        description="Delay before resetting value for pulse operations.",
+    )
+    comment: str | None = Field(
+        default=None,
+        description="Optional operator-facing note describing the intent of this step.",
+    )
+
+    @validator("operation")
+    def validate_operation(cls, value: str) -> str:
+        normalized = value.lower()
+        if normalized not in {"set", "pulse"}:
+            raise ValueError("operation must be 'set' or 'pulse'")
+        return normalized
+
+    @validator("value")
+    def ensure_value_present(cls, value: Any) -> Any:
+        if value is None:
+            raise ValueError("value is required for command tasks")
+        return value
+
+    @validator("reset_value", always=True)
+    def ensure_reset_value_for_pulse(cls, reset_value: Any, values: Dict[str, Any]) -> Any:
+        if values.get("operation") == "pulse" and reset_value is None:
+            raise ValueError("reset_value is required when operation is 'pulse'")
+        return reset_value
+
+    @validator("hold_seconds", always=True)
+    def normalize_hold_seconds(cls, hold_seconds: float, values: Dict[str, Any]) -> float:
+        if values.get("operation") != "pulse":
+            return 0.0
+        return hold_seconds
+
+
+class CreateCommandRequest(BaseModel):
+    purpose: str = Field(
+        ..., min_length=3, max_length=200, description="Short summary of the intended effect."
+    )
+    tasks: List[CommandTask] = Field(
+        ..., min_items=1, description="Ordered control steps to execute against the simulator."
+    )
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict, description="Optional additional context for the client."
+    )
+    priority: int = Field(
+        default=0, ge=-10, le=10, description="Higher priority commands are dispatched first."
+    )
+    guidance: str | None = Field(
+        default=None, description="Long-form instructions or rationale for human review."
+    )
+
+    @validator("purpose")
+    def strip_purpose(cls, value: str) -> str:
+        return value.strip()
+
+
+class CommandResultRequest(BaseModel):
+    status: str = Field(..., description="'completed' when successful, 'failed' when not.")
+    detail: str | None = Field(default=None, description="Human-readable result summary.")
+    outputs: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Optional machine-readable data captured while executing the command.",
+    )
+
+    @validator("status")
+    def normalize_status(cls, value: str) -> str:
+        normalized = value.lower()
+        if normalized not in {"completed", "failed"}:
+            raise ValueError("status must be 'completed' or 'failed'")
+        return normalized
 
 
 def _normalize_name(name: str) -> str:
@@ -146,6 +251,41 @@ def _resolve_dict_key(d: Dict[str, Any], target: str) -> str | None:
         if _normalize_name(key) == normalized:
             return key
     return None
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _verify_command_token(token: str | None) -> None:
+    if not token or token != COMMAND_TOKEN:
+        raise HTTPException(status_code=401, detail="Invalid or missing command token")
+
+
+def _public_command_view(command: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        key: value
+        for key, value in command.items()
+        if not key.startswith("_")
+    }
+
+
+def _trim_history_locked() -> None:
+    if len(command_store) <= COMMAND_HISTORY_LIMIT:
+        return
+
+    removable = sorted(
+        (
+            entry
+            for entry in command_store.values()
+            if entry["status"] in {"completed", "failed"}
+        ),
+        key=lambda entry: entry["_sequence"],
+    )
+
+    while len(command_store) > COMMAND_HISTORY_LIMIT and removable:
+        oldest = removable.pop(0)
+        command_store.pop(oldest["id"], None)
 
 
 @app.post("/api/state")
@@ -277,3 +417,107 @@ async def get_state_group(group: str):
         raise HTTPException(status_code=404, detail=f"No variables found for group '{group}'")
 
     return {"last_updated": last_updated, "data": selected}
+
+
+@app.post("/api/commands")
+async def create_command(
+    request: CreateCommandRequest,
+    command_token: str | None = Header(default=None, alias="X-Command-Token"),
+):
+    _verify_command_token(command_token)
+
+    command_id = uuid4().hex
+    now = _now_iso()
+    entry = {
+        "id": command_id,
+        "purpose": request.purpose,
+        "guidance": request.guidance,
+        "tasks": [task.dict() for task in request.tasks],
+        "metadata": request.metadata,
+        "priority": request.priority,
+        "status": "pending",
+        "created_at": now,
+        "claimed_at": None,
+        "claimed_by": None,
+        "result": None,
+        "_sequence": next(command_sequence),
+    }
+
+    async with command_lock:
+        command_store[command_id] = entry
+        _trim_history_locked()
+
+    return {"status": "queued", "command": _public_command_view(entry)}
+
+
+@app.get("/api/commands/next")
+async def get_next_commands(
+    limit: int = 1,
+    client_id: str = "default",
+    command_token: str | None = Header(default=None, alias="X-Command-Token"),
+):
+    _verify_command_token(command_token)
+
+    if limit <= 0 or limit > 50:
+        raise HTTPException(status_code=400, detail="limit must be between 1 and 50")
+
+    now = _now_iso()
+    claimed: List[Dict[str, Any]] = []
+
+    async with command_lock:
+        pending = [
+            entry for entry in command_store.values() if entry["status"] == "pending"
+        ]
+        pending.sort(key=lambda entry: (-entry["priority"], entry["_sequence"]))
+
+        for entry in pending[:limit]:
+            entry["status"] = "in_progress"
+            entry["claimed_at"] = now
+            entry["claimed_by"] = client_id
+            claimed.append(_public_command_view(entry))
+
+    return {"commands": claimed}
+
+
+@app.post("/api/commands/{command_id}/result")
+async def submit_command_result(
+    command_id: str,
+    request: CommandResultRequest,
+    command_token: str | None = Header(default=None, alias="X-Command-Token"),
+):
+    _verify_command_token(command_token)
+
+    async with command_lock:
+        entry = command_store.get(command_id)
+        if entry is None:
+            raise HTTPException(status_code=404, detail="Command not found")
+
+        if entry["status"] not in {"in_progress", "pending"}:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Command is already marked as {entry['status']}",
+            )
+
+        entry["status"] = request.status
+        entry["result"] = {
+            "detail": request.detail,
+            "outputs": request.outputs,
+            "reported_at": _now_iso(),
+        }
+
+    return {"command": _public_command_view(entry)}
+
+
+@app.get("/api/commands/{command_id}")
+async def get_command(
+    command_id: str,
+    command_token: str | None = Header(default=None, alias="X-Command-Token"),
+):
+    _verify_command_token(command_token)
+
+    entry = command_store.get(command_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail="Command not found")
+
+    return {"command": _public_command_view(entry)}
+

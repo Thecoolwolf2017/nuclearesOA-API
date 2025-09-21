@@ -1,10 +1,11 @@
-openapi: 3.1.0
+﻿openapi: 3.1.0
 info:
-  title: Nuclear Plant State API
+  title: Nuclear Plant Control API
   description: |
-    Accesses real-time state data for every variable exposed by the Nucleares in-game webserver.
-    Use `last_updated` to detect stale information; inspect the `data` payload for the values you need.
-  version: 2.0.0
+    Accesses real-time state data for every variable exposed by the Nucleares in-game webserver
+    and queues operator-authorised control commands. Use `last_updated` to detect stale telemetry;
+    queue commands cautiously and monitor their execution status.
+  version: 3.0.0
 servers:
   - url: https://your-api-url.onrender.com/api
     description: Production server
@@ -22,25 +23,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  last_updated:
-                    type: string
-                    format: date-time
-                    description: ISO timestamp of the most recent snapshot (may be null if nothing was uploaded yet)
-                  schema_groups:
-                    type: array
-                    items:
-                      type: string
-                    description: Groups defined in `variables.json`
-                  inferred_groups:
-                    type: array
-                    items:
-                      type: string
-                    description: Additional group names discovered from the incoming dataset
-                required:
-                  - schema_groups
-                  - inferred_groups
+                $ref: '#/components/schemas/GroupListResponse'
   /state:
     get:
       operationId: getFullState
@@ -94,21 +77,206 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/StateResponse'
+  /commands:
+    post:
+      operationId: queueCommand
+      summary: Queue control command
+      description: |
+        Queues an ordered set of control steps for the local sender to execute against the Nucleares webserver.
+        Provide a concise `purpose`, optional `metadata`, and one or more `tasks`. Each task targets a specific
+        webserver variable and specifies an operation (`set` or `pulse`).
+      tags: [commands]
+      security:
+        - CommandToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommandRequest'
+      responses:
+        '200':
+          description: Command accepted into the queue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandResponse'
+  /commands/{command_id}:
+    get:
+      operationId: getCommandStatus
+      summary: Get command status
+      description: |
+        Retrieves the current status of a previously queued command, including claim information and
+        any execution result reported by the local sender.
+      tags: [commands]
+      parameters:
+        - in: path
+          name: command_id
+          required: true
+          schema:
+            type: string
+          description: Identifier returned by `/commands`.
+      security:
+        - CommandToken: []
+      responses:
+        '200':
+          description: Command envelope with latest status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandResponse'
 components:
+  securitySchemes:
+    CommandToken:
+      type: apiKey
+      in: header
+      name: X-Command-Token
+      description: Shared secret used to authenticate command operations.
+  schemas:
+    ISO8601:
+      type: string
+      format: date-time
+      nullable: true
+      description: Timestamp of the last successful upload
+    GenericData:
+      description: The requested portion of the plant state snapshot
+    StateEnvelope:
+      type: object
+      properties:
+        last_updated:
+          $ref: '#/components/schemas/ISO8601'
+        data:
+          $ref: '#/components/schemas/GenericData'
+      required:
+        - data
+    GroupListResponse:
+      type: object
+      properties:
+        last_updated:
+          $ref: '#/components/schemas/ISO8601'
+        schema_groups:
+          type: array
+          items:
+            type: string
+          description: Groups defined in `variables.json`
+        inferred_groups:
+          type: array
+          items:
+            type: string
+          description: Additional group names discovered from the incoming dataset
+      required:
+        - schema_groups
+        - inferred_groups
+    CommandTask:
+      type: object
+      properties:
+        operation:
+          type: string
+          enum: [set, pulse]
+          description: Operation to perform against the target variable.
+        variable:
+          type: string
+          description: Webserver variable name (case-insensitive).
+        value:
+          description: Value applied for the operation (boolean, string, or number).
+        reset_value:
+          description: Value applied after the hold period for `pulse` operations.
+        hold_seconds:
+          type: number
+          description: Seconds to wait before applying `reset_value` (defaults to 1 when omitted).
+        comment:
+          type: string
+          description: Optional human-readable note for the step.
+      required:
+        - operation
+        - variable
+        - value
+    CreateCommandRequest:
+      type: object
+      properties:
+        purpose:
+          type: string
+          description: Short summary of the intended outcome.
+        guidance:
+          type: string
+          nullable: true
+          description: Additional detail for human operators.
+        priority:
+          type: integer
+          description: Dispatch priority (higher executes sooner).
+        metadata:
+          type: object
+          description: Optional extra context passed through to the client.
+        tasks:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CommandTask'
+      required:
+        - purpose
+        - tasks
+    CommandResult:
+      type: object
+      nullable: true
+      properties:
+        detail:
+          type: string
+          description: Operator-facing summary provided by the sender.
+        outputs:
+          type: object
+          description: Machine-readable payload emitted by the sender.
+        reported_at:
+          $ref: '#/components/schemas/ISO8601'
+    CommandEnvelope:
+      type: object
+      properties:
+        id:
+          type: string
+        purpose:
+          type: string
+        guidance:
+          type: string
+          nullable: true
+        priority:
+          type: integer
+        metadata:
+          type: object
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommandTask'
+        status:
+          type: string
+          description: Current state of the command (pending, in_progress, completed, failed).
+        created_at:
+          $ref: '#/components/schemas/ISO8601'
+        claimed_at:
+          $ref: '#/components/schemas/ISO8601'
+        claimed_by:
+          type: string
+          nullable: true
+        result:
+          $ref: '#/components/schemas/CommandResult'
+      required:
+        - id
+        - purpose
+        - tasks
+        - status
+        - created_at
+    CommandResponse:
+      type: object
+      properties:
+        command:
+          $ref: '#/components/schemas/CommandEnvelope'
+        status:
+          type: string
+          description: Status message returned by the server.
+      required:
+        - command
   responses:
     StateResponse:
       description: State payload containing the requested data
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              last_updated:
-                type: string
-                format: date-time
-                nullable: true
-                description: Timestamp of the last successful upload
-              data:
-                description: The requested portion of the plant state snapshot
-            required:
-              - data
+            $ref: '#/components/schemas/StateEnvelope'
