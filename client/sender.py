@@ -1,3 +1,4 @@
+﻿from pathlib import Path
 import json
 import hmac
 import time
@@ -9,7 +10,10 @@ from urllib.parse import urljoin
 from datetime import datetime, timezone
 
 # Load config
-with open('client/config.json') as f:
+CONFIG_PATH = Path(__file__).with_name('config.json')
+if not CONFIG_PATH.exists():
+    raise FileNotFoundError('client/config.json not found. Copy client/config.example.json and fill in your credentials.')
+with CONFIG_PATH.open() as f:
     config = json.load(f)
 
 API_URL = config['API_URL']

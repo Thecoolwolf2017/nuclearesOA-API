@@ -50,6 +50,7 @@ Schema-driven value translations (for `oneOf` enumerations) still work automatic
 The polling script in `client/sender.py` fetches the game batch endpoint (`/?Variable=WEBSERVER_BATCH_GET&value=*`), recursively normalizes nested JSON strings, and pushes the snapshot to the API. After synchronising telemetry, it optionally polls the command queue and replays the requested control actions against the local webserver.
 
 `client/config.json` fields:
+> Copy `client/config.example.json` to `client/config.json` and fill in your Render URL, API key, and command token before running the sender.
 
 - `GAME_URL`: Base URL for the in-game webserver (no trailing slash). Used for both telemetry reads and command writes unless `GAME_COMMAND_URL` is supplied.
 - `API_URL`: Fully-qualified URL to the Render deployment ending with `/api/state`.
@@ -95,6 +96,7 @@ This API is designed **only for simulation/gameplay purposes**.
   - A timestamp of when the data was last updated.
   - Execution summaries for issued commands.
 - **What data is not collected:**
+  - API keys, command tokens, and other credentials stay in Render environment variables or local config files and are never exposed via the public API.
   - No personal, sensitive, or user-identifiable data is collected, stored, or transmitted.
   - No chat content, account information, or system details are recorded.
 - **How the data is used:**
