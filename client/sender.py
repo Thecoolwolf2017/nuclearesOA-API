@@ -4,7 +4,7 @@ import time
 import socket
 import hashlib
 import requests
-from typing import Any, Dict, List
+from typing import Any, Dict, Iterable, List, Set
 from urllib.parse import urljoin
 from datetime import datetime, timezone
 
@@ -45,6 +45,24 @@ class CommandExecutor:
         self.client_id = client_id
         self.poll_limit = max(1, min(50, poll_limit))
         self.timeout = timeout
+        self.allowed_post_vars: Set[str] | None = None
+
+    def update_catalog(self, catalog: Dict[str, Any]) -> None:
+        """Update the set of writable variables exposed by the webserver."""
+        post_section = catalog.get('post') or catalog.get('POST')
+        allowed: Set[str] = set()
+        if isinstance(post_section, dict):
+            post_section = post_section.values()
+        if isinstance(post_section, Iterable) and not isinstance(post_section, (str, bytes)):
+            for entry in post_section:
+                if isinstance(entry, str):
+                    allowed.add(entry.upper())
+                elif isinstance(entry, dict):
+                    variable = entry.get('variable') or entry.get('name')
+                    if isinstance(variable, str):
+                        allowed.add(variable.upper())
+        if allowed:
+            self.allowed_post_vars = allowed
 
     def poll_and_execute(self) -> None:
         """Fetch pending commands and execute them sequentially."""
@@ -62,7 +80,7 @@ class CommandExecutor:
 
         try:
             payload = response.json()
-        except ValueError as exc:
+        except ValueError:
             print('CMD POLL FAIL: Invalid JSON from command API')
             return
 
@@ -134,8 +152,11 @@ class CommandExecutor:
         raise ValueError(f"Task {idx} has unsupported operation '{operation}'")
 
     def _send_game_command(self, variable: str, value: Any) -> None:
+        if self.allowed_post_vars and variable.upper() not in self.allowed_post_vars:
+            raise ValueError(f"Unsupported control variable '{variable}'")
+
         formatted_value = self._format_value(value)
-        response = requests.get(
+        response = requests.post(
             self.game_command_url,
             params={'Variable': variable, 'value': formatted_value},
             timeout=self.timeout,
@@ -192,6 +213,32 @@ def deep_parse(value):
     return value
 
 
+def fetch_variable_catalog(command_base: str, timeout: int) -> Dict[str, Any]:
+    try:
+        response = requests.get(
+            command_base.rstrip('/') + '/',
+            params={'Variable': 'WEBSERVER_LIST_VARIABLES_JSON'},
+            timeout=timeout,
+        )
+        response.raise_for_status()
+        data = response.json()
+        if isinstance(data, dict):
+            return data
+    except Exception as exc:
+        print('CMD CATALOG FAIL:', exc)
+    return {}
+
+
+def inject_catalog(target: Dict[str, Any], catalog: Dict[str, Any]) -> None:
+    if not catalog:
+        return
+    try:
+        meta = target.setdefault('_meta', {})
+        meta['webserver_catalog'] = catalog
+    except Exception:
+        target['_webserver_catalog'] = catalog
+
+
 executor = None
 if COMMAND_URL and COMMAND_TOKEN:
     executor = CommandExecutor(
@@ -217,11 +264,18 @@ while True:
             raw_data = resp.json()
         except ValueError as exc:
             snippet = resp.text[:200].replace(chr(10), ' ').replace(chr(13), ' ')
+            raise ValueError(f'Unexpected payload (status {status}): {snippet}') from exc
         game_values = raw_data.get('values', {})
         if not isinstance(game_values, dict):
             raise ValueError('Unexpected payload structure from game webserver')
 
         game_data = deep_parse(game_values)
+        catalog = fetch_variable_catalog(GAME_COMMAND_URL, COMMAND_TIMEOUT)
+        if catalog:
+            inject_catalog(game_data, catalog)
+            if executor:
+                executor.update_catalog(catalog)
+
         payload = {
             'timestamp': datetime.now(timezone.utc).isoformat(),
             'data': game_data,
@@ -242,4 +296,3 @@ while True:
         executor.poll_and_execute()
 
     time.sleep(POLL_INTERVAL)
-

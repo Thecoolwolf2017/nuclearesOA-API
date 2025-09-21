@@ -63,6 +63,8 @@ The polling script in `client/sender.py` fetches the game batch endpoint (`/?Var
 
 The sender prints `API SYNC OK` on successful uploads, followed by command execution summaries (e.g., `CMD[abc123] OK Start condenser pump`). Errors are logged to the console and retried after the poll interval.
 
+- The sender also mirrors the game's `WEBSERVER_LIST_VARIABLES_JSON` output inside the telemetry payload (`_meta.webserver_catalog`). Command requests are validated against that list before they hit the plant, so unsupported variable names fail fast with a descriptive error.
+
 ### Command queue semantics
 
 Commands queued through `/api/commands` follow this structure:

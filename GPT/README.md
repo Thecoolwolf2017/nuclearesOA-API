@@ -58,6 +58,7 @@ This document describes the setup of each component needed to get the full Opera
 
 - The GPT queues intent-focused commands (`purpose`, `tasks`) through the Render API.
 - The local sender claims commands, executes the ordered tasks against the webserver, and reports success or failure back to the API.
+- The sender publishes the available `GET`/`POST` variables from `WEBSERVER_LIST_VARIABLES_JSON` inside telemetry (`_meta.webserver_catalog`). The GPT should consult this list before queuing controls; unsupported variables are rejected immediately with a descriptive error.
 - The GPT polls command status and validates the resulting telemetry before moving on to the next step.
 
 ## Use Cases

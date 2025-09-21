@@ -1,9 +1,9 @@
 {
-  "API_URL": "https://nuclearesoa-api-936z.onrender.com/api/state",
-  "API_KEY": "75145763bb64002af4842fd023269870",
+  "API_URL": "https://your-api-url.onrender.com/api/state",
+  "API_KEY": "changeme--key",
   "GAME_URL": "http://localhost:8785/",
-  "COMMAND_URL": "https://nuclearesoa-api-936z.onrender.com/api/commands",
-  "COMMAND_TOKEN": "changeme-command",
+  "COMMAND_URL": "https://your-api-url.onrender.com/api/commands",
+  "COMMAND_TOKEN": "changeme-command-token",
   "COMMAND_POLL_LIMIT": 3,
   "COMMAND_TIMEOUT": 10,
   "CLIENT_ID": "local-sender"

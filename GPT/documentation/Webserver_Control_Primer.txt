@@ -1,0 +1,23 @@
+Webserver Control Primer
+========================
+
+The local sender mirrors the Nucleares webserver''s `WEBSERVER_LIST_VARIABLES_JSON` response into the telemetry stream that the Operating Assistant can query through `/api/state`.
+
+Where to find it
+----------------
+- Every state snapshot contains `_meta.webserver_catalog`.
+- `_meta.webserver_catalog.post` enumerates every variable that accepts write commands.
+- `_meta.webserver_catalog.get` lists the read-only variables exposed by the game webserver.
+
+How to use it
+-------------
+1. Query `/api/state?flat=true` (or the relevant group) and inspect `_meta.webserver_catalog.post`.
+2. Only queue commands that target variables present in that list (case-insensitive).
+3. If a desired lever is missing, inform the operator that the control is not exposed via the tablet and outline the manual procedure instead.
+
+Automation safeguards
+---------------------
+- The sender validates every queued task against `_meta.webserver_catalog.post` before reaching the plant. Unsupported variables produce a clear `Unsupported control variable` error.
+- Pulse operations still work, provided both the active and reset variables exist in the catalog.
+
+Tip: For quick lookups, ask the OA to "list writable variables containing PUMP". It can filter the catalog and avoid trial-and-error command attempts.
