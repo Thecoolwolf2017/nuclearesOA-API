@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "label": "Smoke Test",
-  "message": "fail",
-  "color": "red",
+  "message": "pass",
+  "color": "brightgreen",
   "cacheSeconds": 30
 }
