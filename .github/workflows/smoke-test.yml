@@ -99,8 +99,28 @@ jobs:
       - name: Generate badge SVGs
         if: ${{ always() }}
         run: |
-          python -m pip install --quiet anybadge
-          python -c "import json, pathlib; from anybadge import Badge; badge_dir = pathlib.Path('badge'); availability = json.loads((badge_dir / 'smoke-availability.json').read_text(encoding='utf-8')); Badge(label=availability['label'], value=availability['message'], default_color=availability['color'], thresholds={availability['message']: availability['color']}).write_badge(badge_dir / 'smoke-availability.svg'); status = json.loads((badge_dir / 'smoke-status.json').read_text(encoding='utf-8')); Badge(label=status['label'], value=status['message'], default_color=status['color'], thresholds={status['message']: status['color']}).write_badge(badge_dir / 'smoke-status.svg')"
+          python - <<'PY'
+from pathlib import Path
+import json
+from urllib.parse import quote_plus
+from urllib.request import urlretrieve
+
+badge_dir = Path("badge")
+badge_dir.mkdir(exist_ok=True)
+
+def fetch(name: str) -> None:
+    data = json.loads((badge_dir / f"{name}.json").read_text(encoding="utf-8"))
+    url = (
+        "https://img.shields.io/static/v1"
+        f"?label={quote_plus(data['label'])}"
+        f"&message={quote_plus(data['message'])}"
+        f"&color={quote_plus(data['color'])}"
+    )
+    urlretrieve(url, badge_dir / f"{name}.svg")
+
+fetch("smoke-availability")
+fetch("smoke-status")
+PY
 
       - name: Debug badge outputs
         if: ${{ always() }}
