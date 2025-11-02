@@ -1,0 +1,32 @@
+name: Smoke Test
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  schedule:
+    - cron: "0 * * * *"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt requests
+
+      - name: Run API smoke test
+        env:
+          NUCLEARES_API_BASE: ${{ secrets.NUCLEARES_API_BASE }}
+          NUCLEARES_COMMAND_TOKEN: ${{ secrets.NUCLEARES_COMMAND_TOKEN }}
+        run: |
+          python tests/smoke_test.py

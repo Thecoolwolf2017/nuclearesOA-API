@@ -1,0 +1,84 @@
+from __future__ import annotations
+
+import json
+import os
+import sys
+from dataclasses import dataclass
+from typing import Any
+
+import requests
+
+
+class SmokeTestError(Exception):
+    """Raised when the smoke test encounters a failure."""
+
+
+@dataclass
+class SmokeTestConfig:
+    base_url: str
+    command_token: str | None = None
+
+    @classmethod
+    def from_env(cls) -> "SmokeTestConfig":
+        base_url = os.getenv("NUCLEARES_API_BASE")
+        if not base_url:
+            raise SmokeTestError("Environment variable NUCLEARES_API_BASE is required.")
+        base_url = base_url.rstrip("/")
+
+        token = os.getenv("NUCLEARES_COMMAND_TOKEN")
+        return cls(base_url=base_url, command_token=token)
+
+
+def request_json(method: str, url: str, *, headers: dict[str, str] | None = None, timeout: float = 10.0) -> Any:
+    response = requests.request(method, url, headers=headers, timeout=timeout)
+    if response.status_code != 200:
+        raise SmokeTestError(f"{method} {url} -> {response.status_code} {response.text}")
+    try:
+        return response.json()
+    except json.JSONDecodeError as exc:
+        raise SmokeTestError(f"{method} {url} returned non-JSON body") from exc
+
+
+def check_groups(config: SmokeTestConfig) -> None:
+    payload = request_json("GET", f"{config.base_url}/groups")
+    if not isinstance(payload, dict) or "schema_groups" not in payload:
+        raise SmokeTestError("Unexpected response structure from /groups")
+
+
+def check_state(config: SmokeTestConfig) -> None:
+    payload = request_json("GET", f"{config.base_url}/state?flat=true&limit=1")
+    if not isinstance(payload, dict) or "data" not in payload:
+        raise SmokeTestError("Unexpected response structure from /state")
+    data = payload["data"]
+    if not isinstance(data, dict):
+        raise SmokeTestError("/state payload returned non-dict data")
+
+
+def check_commands(config: SmokeTestConfig) -> None:
+    headers = {}
+    if config.command_token:
+        headers["X-Command-Token"] = config.command_token
+    try:
+        payload = request_json("GET", f"{config.base_url}/commands/next?limit=1&client_id=smoke-test", headers=headers)
+    except SmokeTestError as exc:
+        if "401" in str(exc) or "403" in str(exc):
+            raise SmokeTestError("Command endpoint rejected authentication; set NUCLEARES_COMMAND_TOKEN.") from exc
+        raise
+    if not isinstance(payload, dict) or "commands" not in payload:
+        raise SmokeTestError("Unexpected response structure from /commands/next")
+
+
+def main() -> None:
+    config = SmokeTestConfig.from_env()
+    check_groups(config)
+    check_state(config)
+    check_commands(config)
+    print("Smoke test passed.")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except SmokeTestError as exc:
+        print(f"Smoke test failed: {exc}", file=sys.stderr)
+        raise SystemExit(1) from exc
