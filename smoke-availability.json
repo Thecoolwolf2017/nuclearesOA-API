@@ -2,5 +2,6 @@
   "schemaVersion": 1,
   "label": "Smoke Availability",
   "message": "online",
-  "color": "brightgreen"
+  "color": "brightgreen",
+  "cacheSeconds": 300
 }
