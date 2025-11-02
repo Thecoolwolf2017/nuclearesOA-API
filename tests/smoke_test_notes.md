@@ -13,6 +13,12 @@ This document captures operational details for `tests/smoke_test.py` so future r
 - `2` — API unreachable or `/health` reported stale telemetry. Workflow succeeds so automation continues, but the smoke badges flip to `offline / fail`.
 - `1` — Any other failure (HTTP 4xx/5xx, decode errors, bad configuration). Workflow fails and badges remain `fail`.
 
+## Endpoints covered
+
+- `GET /status` — verifies telemetry metadata, uptime, and build identifiers.
+- `GET /health` — confirms the service reports `status="ok"` and telemetry freshness.
+- `GET /groups`, `GET /state`, `GET /commands/next` — ensure core API functionality is available and authenticated as expected.
+
 ## CI workflow behaviour
 
 The GitHub Actions smoke job captures the exit code. Exit `2` is treated as a soft, offline state, while any other non-zero exit terminates the job. Availability and status badges are always updated to reflect the latest run.

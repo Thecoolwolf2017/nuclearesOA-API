@@ -88,6 +88,27 @@ def check_health(config: SmokeTestConfig) -> None:
         raise SmokeTestOffline(f"/health indicates telemetry is stale (age={age})")
 
 
+def check_status(config: SmokeTestConfig) -> None:
+    payload = request_json("GET", f"{config.base_url}/status")
+    if not isinstance(payload, dict):
+        raise SmokeTestError("Unexpected response from /status")
+    status = payload.get("status")
+    telemetry = payload.get("telemetry", {})
+    uptime = payload.get("uptime", {})
+    build = payload.get("build", {})
+    if status not in {"ok", "stale"}:
+        raise SmokeTestError(f"/status returned unexpected status={status}")
+    if "seconds_since_update" not in telemetry:
+        raise SmokeTestError("/status telemetry block missing seconds_since_update")
+    if "seconds" not in uptime or "started_at" not in uptime:
+        raise SmokeTestError("/status uptime block incomplete")
+    if "sha" not in build:
+        raise SmokeTestError("/status build block missing sha")
+    if status != "ok":
+        age = telemetry.get("seconds_since_update")
+        raise SmokeTestOffline(f"/status reported status={status} (age={age})")
+
+
 def check_state(config: SmokeTestConfig) -> None:
     payload = request_json("GET", f"{config.base_url}/state?flat=true&limit=1")
     if not isinstance(payload, dict) or "data" not in payload:
@@ -113,6 +134,7 @@ def check_commands(config: SmokeTestConfig) -> None:
 
 def main() -> None:
     config = SmokeTestConfig.from_env()
+    check_status(config)
     check_health(config)
     check_groups(config)
     check_state(config)

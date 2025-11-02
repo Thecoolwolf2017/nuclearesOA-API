@@ -53,6 +53,9 @@ command_store: Dict[str, Dict[str, Any]] = {}
 command_sequence = count()
 COMMAND_HISTORY_LIMIT = 250
 HEALTH_MAX_AGE_SECONDS = int(os.getenv("HEALTH_MAX_AGE_SECONDS", "300"))
+START_TIME = datetime.now(timezone.utc)
+BUILD_SHA = os.getenv("BUILD_SHA", "dev")
+BUILD_REF = os.getenv("BUILD_REF")
 
 
 class CommandTask(BaseModel):
@@ -303,21 +306,17 @@ def _parse_timestamp(value: str | None) -> datetime | None:
         return None
 
 
-@app.get("/api/health")
-async def get_health() -> JSONResponse:
+def _build_status_payload(include_commands: bool = True) -> tuple[Dict[str, Any], bool]:
     now = datetime.now(timezone.utc)
     last_dt = _parse_timestamp(last_updated)
+
     telemetry_age: float | None = None
     telemetry_fresh = False
     if last_dt is not None:
         telemetry_age = (now - last_dt).total_seconds()
         telemetry_fresh = telemetry_age <= HEALTH_MAX_AGE_SECONDS
 
-    status_counts: Dict[str, int] = {}
-    for entry in command_store.values():
-        status_counts[entry["status"]] = status_counts.get(entry["status"], 0) + 1
-
-    response_body: Dict[str, Any] = {
+    payload: Dict[str, Any] = {
         "status": "ok" if telemetry_fresh else "stale",
         "telemetry": {
             "last_updated": last_updated,
@@ -325,14 +324,39 @@ async def get_health() -> JSONResponse:
             "fresh": telemetry_fresh,
             "max_age_seconds": HEALTH_MAX_AGE_SECONDS,
         },
-        "commands": {
-            "total": len(command_store),
-            "by_status": status_counts,
+        "uptime": {
+            "started_at": START_TIME.isoformat(),
+            "seconds": (now - START_TIME).total_seconds(),
+        },
+        "build": {
+            "sha": BUILD_SHA,
+            "ref": BUILD_REF,
         },
     }
 
+    if include_commands:
+        status_counts: Dict[str, int] = {}
+        for entry in command_store.values():
+            status_counts[entry["status"]] = status_counts.get(entry["status"], 0) + 1
+        payload["commands"] = {
+            "total": len(command_store),
+            "by_status": status_counts,
+        }
+
+    return payload, telemetry_fresh
+
+
+@app.get("/api/status")
+async def get_status() -> Dict[str, Any]:
+    payload, _ = _build_status_payload(include_commands=True)
+    return payload
+
+
+@app.get("/api/health")
+async def get_health() -> JSONResponse:
+    payload, telemetry_fresh = _build_status_payload(include_commands=True)
     status_code = 200 if telemetry_fresh else 503
-    return JSONResponse(response_body, status_code=status_code)
+    return JSONResponse(payload, status_code=status_code)
 
 
 @app.post("/api/state")
