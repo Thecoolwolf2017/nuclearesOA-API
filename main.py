@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi import FastAPI, Header, HTTPException, Request, Query
 from typing import Any, Dict, List
 
 import asyncio
@@ -8,6 +8,7 @@ import json
 import os
 import sys
 from datetime import datetime, timezone
+from bisect import bisect_right
 from itertools import count
 from uuid import uuid4
 
@@ -314,12 +315,50 @@ async def update_state(request: Request):
 
 
 @app.get("/api/state")
-async def get_full_state(flat: bool = False):
+async def get_full_state(
+    flat: bool = False,
+    limit: int = Query(
+        500,
+        ge=0,
+        le=5000,
+        description="Maximum number of flattened entries to return when flat=true. Set to 0 for no limit.",
+    ),
+    cursor: str | None = Query(
+        default=None,
+        description="When flat=true, resume after the provided key (exclusive) to paginate large snapshots.",
+    ),
+):
     if not current_state:
         raise HTTPException(status_code=404, detail="State has not been populated yet")
 
-    data = _flatten_state(current_state) if flat else current_state
-    return {"last_updated": last_updated, "data": data}
+    if not flat:
+        return {"last_updated": last_updated, "data": current_state}
+
+    flat_state = _flatten_state(current_state)
+    if limit == 0:
+        return {"last_updated": last_updated, "data": flat_state}
+
+    keys = sorted(flat_state)
+    start_index = 0
+    if cursor is not None:
+        start_index = bisect_right(keys, cursor)
+
+    slice_keys = keys[start_index : start_index + limit]
+    data = {key: flat_state[key] for key in slice_keys}
+
+    next_cursor = None
+    if start_index + len(slice_keys) < len(keys):
+        next_cursor = slice_keys[-1]
+
+    pagination = {
+        "limit": limit,
+        "cursor": cursor,
+        "next_cursor": next_cursor,
+        "remaining": max(0, len(keys) - (start_index + len(slice_keys))),
+        "total": len(keys),
+    }
+
+    return {"last_updated": last_updated, "data": data, "pagination": pagination}
 
 
 @app.get("/api/groups")

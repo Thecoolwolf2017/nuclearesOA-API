@@ -28,7 +28,7 @@ All endpoints are served beneath `/api`.
 - `POST /api/state`
   Upload a new snapshot from the local sender. The body must be an object containing `timestamp` (ISO-8601 string) and `data` (the full values payload). The request must include an `X-Signature` header with the HMAC-SHA256 signature of the JSON body using the shared API key.
 - `GET /api/state`
-  Returns the latest snapshot. Pass `?flat=true` to receive a flattened dictionary where nested objects are expanded using `.` and `[index]` notation.
+  Returns the latest snapshot. Pass `?flat=true` to receive a flattened dictionary where nested objects are expanded using `.` and `[index]` notation. Flattened responses are paginated by default: use `limit` (defaults to 500) to control page size, `cursor` to continue from the previous page, and `limit=0` if you explicitly need the full flattened payload.
 - `GET /api/groups`
   Lists schema-defined groups (from `variables.json`) and any additional groups inferred from the live dataset (based on prefixes and nested objects).
 - `GET /api/state/{group}`

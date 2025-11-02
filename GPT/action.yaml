@@ -30,14 +30,30 @@ paths:
       summary: Get full snapshot
       description: |
         Returns the entire state snapshot exactly as last uploaded. Add the query parameter `flat=true`
-        to receive a flattened dictionary using dotted keys and `[index]` notation for lists.
+        to receive a flattened dictionary using dotted keys and `[index]` notation for lists. Flattened
+        payloads are automatically paginated; use `limit`/`cursor` to iterate through large datasets.
       parameters:
         - in: query
           name: flat
           required: false
           schema:
             type: boolean
-          description: Whether to flatten the response into a single-level dictionary.
+          description: Whether to flatten the response into a single-level dictionary (defaults to false).
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 5000
+            default: 500
+          description: Maximum number of flattened entries to return per page (ignored when `flat=false`; set to 0 for an unlimited page).
+        - in: query
+          name: cursor
+          required: false
+          schema:
+            type: string
+          description: When paginating flattened data, resume after the provided key (exclusive).
       responses:
         '200':
           $ref: '#/components/responses/StateResponse'
@@ -147,8 +163,26 @@ components:
           $ref: '#/components/schemas/ISO8601'
         data:
           $ref: '#/components/schemas/GenericData'
+        pagination:
+          $ref: '#/components/schemas/StatePagination'
       required:
         - data
+    StatePagination:
+      type: object
+      nullable: true
+      properties:
+        limit:
+          type: integer
+        cursor:
+          type: string
+          nullable: true
+        next_cursor:
+          type: string
+          nullable: true
+        remaining:
+          type: integer
+        total:
+          type: integer
     GroupListResponse:
       type: object
       properties:
