@@ -45,6 +45,19 @@ def check_groups(config: SmokeTestConfig) -> None:
         raise SmokeTestError("Unexpected response structure from /groups")
 
 
+def check_health(config: SmokeTestConfig) -> None:
+    payload = request_json("GET", f"{config.base_url}/health")
+    if not isinstance(payload, dict):
+        raise SmokeTestError("Unexpected response from /health")
+    status = payload.get("status")
+    telemetry = payload.get("telemetry", {})
+    if status != "ok":
+        age = telemetry.get("seconds_since_update")
+        raise SmokeTestError(f"/health reported status={status} (age={age})")
+    if not telemetry.get("fresh"):
+        raise SmokeTestError("/health indicates telemetry is stale")
+
+
 def check_state(config: SmokeTestConfig) -> None:
     payload = request_json("GET", f"{config.base_url}/state?flat=true&limit=1")
     if not isinstance(payload, dict) or "data" not in payload:
@@ -70,6 +83,7 @@ def check_commands(config: SmokeTestConfig) -> None:
 
 def main() -> None:
     config = SmokeTestConfig.from_env()
+    check_health(config)
     check_groups(config)
     check_state(config)
     check_commands(config)

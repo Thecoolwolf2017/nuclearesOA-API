@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Header, HTTPException, Request, Query
+from fastapi.responses import JSONResponse
 from typing import Any, Dict, List
 
 import asyncio
@@ -7,7 +8,7 @@ import hmac
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from bisect import bisect_right
 from itertools import count
 from uuid import uuid4
@@ -51,6 +52,7 @@ command_lock = asyncio.Lock()
 command_store: Dict[str, Dict[str, Any]] = {}
 command_sequence = count()
 COMMAND_HISTORY_LIMIT = 250
+HEALTH_MAX_AGE_SECONDS = int(os.getenv("HEALTH_MAX_AGE_SECONDS", "300"))
 
 
 class CommandTask(BaseModel):
@@ -287,6 +289,50 @@ def _trim_history_locked() -> None:
     while len(command_store) > COMMAND_HISTORY_LIMIT and removable:
         oldest = removable.pop(0)
         command_store.pop(oldest["id"], None)
+
+
+def _parse_timestamp(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        cleaned = value.rstrip("Z")
+        if cleaned == value:
+            return datetime.fromisoformat(value)
+        return datetime.fromisoformat(f"{cleaned}+00:00")
+    except Exception:
+        return None
+
+
+@app.get("/api/health")
+async def get_health() -> JSONResponse:
+    now = datetime.now(timezone.utc)
+    last_dt = _parse_timestamp(last_updated)
+    telemetry_age: float | None = None
+    telemetry_fresh = False
+    if last_dt is not None:
+        telemetry_age = (now - last_dt).total_seconds()
+        telemetry_fresh = telemetry_age <= HEALTH_MAX_AGE_SECONDS
+
+    status_counts: Dict[str, int] = {}
+    for entry in command_store.values():
+        status_counts[entry["status"]] = status_counts.get(entry["status"], 0) + 1
+
+    response_body: Dict[str, Any] = {
+        "status": "ok" if telemetry_fresh else "stale",
+        "telemetry": {
+            "last_updated": last_updated,
+            "seconds_since_update": telemetry_age,
+            "fresh": telemetry_fresh,
+            "max_age_seconds": HEALTH_MAX_AGE_SECONDS,
+        },
+        "commands": {
+            "total": len(command_store),
+            "by_status": status_counts,
+        },
+    }
+
+    status_code = 200 if telemetry_fresh else 503
+    return JSONResponse(response_body, status_code=status_code)
 
 
 @app.post("/api/state")

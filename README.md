@@ -67,6 +67,7 @@ Configure the following environment variables on Render:
 
 - `API_KEY`: shared secret used to sign `/api/state` updates.
 - `COMMAND_TOKEN`: shared secret used by GPT (for command creation) and the local sender (for command execution).
+- `HEALTH_MAX_AGE_SECONDS` (optional): maximum allowed telemetry age before `/api/health` reports `stale` (defaults to 300).
 
 ## API Endpoints
 All endpoints are served beneath `/api`.
@@ -77,6 +78,8 @@ All endpoints are served beneath `/api`.
   Returns the latest snapshot. Pass `?flat=true` to receive a flattened dictionary where nested objects are expanded using `.` and `[index]` notation. Flattened responses are paginated by default: use `limit` (defaults to 500) to control page size, `cursor` to continue from the previous page, and `limit=0` if you explicitly need the full flattened payload.
 - `GET /api/groups`
   Lists schema-defined groups (from `variables.json`) and any additional groups inferred from the live dataset (based on prefixes and nested objects).
+- `GET /api/health`
+  Returns a lightweight health summary, including telemetry freshness (`last_updated`) and command queue counts. Responds with HTTP 503 when telemetry is stale beyond `HEALTH_MAX_AGE_SECONDS`.
 - `GET /api/state/{group}`
   Retrieves variables that belong to the specified group. Group names are case-insensitive; the helper also accepts `all`/`full` to return the entire payload. If the incoming snapshot contained objects whose keys match the requested group, the raw nested structure is returned.
 - `GET /api/state/keys/{key_path}`

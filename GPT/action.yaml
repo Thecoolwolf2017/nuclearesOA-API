@@ -24,6 +24,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GroupListResponse'
+  /health:
+    get:
+      operationId: getHealth
+      summary: Get service health
+      description: |
+        Provides telemetry freshness and command queue status. Returns HTTP 503 when telemetry is stale.
+      responses:
+        '200':
+          description: Health status with fresh telemetry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Health status with stale telemetry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
   /state:
     get:
       operationId: getFullState
@@ -201,6 +220,39 @@ components:
       required:
         - schema_groups
         - inferred_groups
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Overall health indicator (`ok` or `stale`).
+        telemetry:
+          type: object
+          properties:
+            last_updated:
+              $ref: '#/components/schemas/ISO8601'
+            seconds_since_update:
+              type: number
+              nullable: true
+            fresh:
+              type: boolean
+            max_age_seconds:
+              type: integer
+          required:
+            - fresh
+        commands:
+          type: object
+          properties:
+            total:
+              type: integer
+            by_status:
+              type: object
+              additionalProperties:
+                type: integer
+      required:
+        - status
+        - telemetry
+        - commands
     CommandTask:
       type: object
       properties:
