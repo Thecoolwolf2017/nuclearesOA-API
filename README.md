@@ -70,6 +70,22 @@ Configure the following environment variables on Render:
 - `COMMAND_TOKEN`: shared secret used by GPT (for command creation) and the local sender (for command execution).
 - `HEALTH_MAX_AGE_SECONDS` (optional): maximum allowed telemetry age before `/api/health` reports `stale` (defaults to 300 seconds).
 
+> **Smoke test behaviour:** The GitHub Actions smoke workflow treats exit code `2` from `tests/smoke_test.py` as an intentional “offline” state. The job still succeeds so automation continues, but the availability/status badges flip to “offline / fail”. Any other non-zero exit code fails the workflow.
+
+### Smoke test
+
+To exercise the API manually, run the bundled smoke script:
+
+```powershell
+python tests/smoke_test.py
+```
+
+It performs the same checks as the CI job (health, groups, state, commands) and exits with:
+
+- `0` when every endpoint responds with healthy JSON.
+- `2` when the API is unreachable or `/api/health` reports stale telemetry. Workflows treat this as “offline” and keep badges red/grey while still succeeding.
+- `1` for all other failures (HTTP 4xx/5xx, decode errors, bad configuration); the GitHub Actions job fails in this case.
+
 ## API Endpoints
 All endpoints are served beneath `/api`.
 
