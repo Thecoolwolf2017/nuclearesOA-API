@@ -8,9 +8,18 @@ A stripped version of the assistant, without API capabilities, can be found [her
 The GPT is fed data stored in `GPT/documentation`. It uses this data to help and guide the player in operating the in-game nuclear power plant. A private copy of this GPT can be made by OpenAI Plus members, with the capability to query the game webserver through the API. The API receives data from the sender script running locally, which routes it from the local webserver to a public one. The server now organizes every available webserver variable on-demand so GPT can query everything that the game exposes.
 
 ## Quick start
-1. **Deploy the API server** locally or on Render using the steps in the [Deployment](#deployment) section.
-2. **Run the telemetry sender** so your game webserver streams data to the API (see [Running the sender locally](#running-the-sender-locally)).
-3. **Connect the custom GPT action** by uploading the manifest in `GPT/action.yaml` and wiring in your API URL and command token (see [Custom GPT setup](#custom-gpt-setup)).
+1. **Get the code** by cloning this repository (or downloading the ZIP) onto the machine that will run the API and sender.
+2. **Deploy the API server** locally or on Render using the steps in the [Deployment](#deployment) section.
+3. **Run the telemetry sender** so your game webserver streams data to the API (see [Running the sender locally](#running-the-sender-locally)). Make sure the Nucleares in-game webserver is running and reachable at the URL you configure in `GAME_URL`.
+4. **Connect the custom GPT action** by uploading the manifest in `GPT/action.yaml` and wiring in your API URL and command token (see [Custom GPT setup](#custom-gpt-setup)).
+5. Step through the [Verify the end-to-end setup](#verify-the-end-to-end-setup) checklist to ensure telemetry and commands flow correctly.
+
+## Prerequisites
+- **Software**: Python 3.11+, the Nucleares game with its in-game webserver enabled, and either PowerShell (Windows) or a POSIX shell (macOS/Linux).
+- **Accounts**: Render (for hosted deployment) and ChatGPT Plus/Team (to create the GPT). Local-only users can skip Render but still need GPT access.
+- **Secrets**: Choose strong values for `API_KEY` and `COMMAND_TOKEN` and keep them outside version control.
+- **Networking**: The machine running `client/sender.py` must reach both the game webserver and your API host (localhost or Render).
+- **Project layout**: Keep the `GPT/` directory intact; you’ll zip it or select `GPT/action.yaml` directly when uploading the action manifest.
 
 ## Deployment
 The server is designed to run on [Render](https://render.com).
@@ -156,6 +165,12 @@ Additional context supplied in `metadata` or `guidance` is forwarded to the clie
 5. Under **Actions**, choose **Upload action** and select `nucleares-gpt.zip` (or directly upload `GPT/action.yaml`).
 6. When prompted for authentication, add a secret named `CommandToken` with the same value you configured in the API (`COMMAND_TOKEN`). This ensures command endpoints require the shared header `X-Command-Token`.
 7. Save the GPT and use the built-in tester to call `/groups` or `/state` with a small `limit` to confirm the connection before sharing it with others.
+8. Update the GPT description/instructions so human operators know they must approve real-world control actions manually.
+
+## Verify the end-to-end setup
+- With the sender running, hit `GET /api/state` (optionally `?flat=true&limit=5`) and confirm the response shows `last_updated` and a handful of variables.
+- Trigger a test command through the GPT or a manual `POST /api/commands` and watch the sender log (`CMD[...] OK/FAIL`) to make sure the command loop is functioning.
+- If the GPT reports pagination warnings, supply `limit`/`cursor` parameters as documented above.
 
 ## Privacy
 This API is designed **only for simulation/gameplay purposes**.
