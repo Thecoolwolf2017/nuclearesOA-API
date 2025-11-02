@@ -44,6 +44,7 @@ The server is designed to run on [Render](https://render.com).
    $env:COMMAND_TOKEN = "choose-another-secret"
    ```
    > On macOS/Linux use `export API_KEY=...` / `export COMMAND_TOKEN=...`.
+   > Tip: run `python scripts/rotate_secrets.py` to generate fresh values and store them in a local `.env`.
 3. Launch the API with Uvicorn:
    ```powershell
    python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
@@ -71,6 +72,8 @@ Configure the following environment variables on Render:
 - `HEALTH_MAX_AGE_SECONDS` (optional): maximum allowed telemetry age before `/api/health` reports `stale` (defaults to 300 seconds).
 
 > **Smoke test behaviour:** The GitHub Actions smoke workflow treats exit code `2` from `tests/smoke_test.py` as an intentional “offline” state. The job still succeeds so automation continues, but the availability/status badges flip to “offline / fail”. Any other non-zero exit code fails the workflow.
+
+Use `python scripts/rotate_secrets.py` to generate fresh `API_KEY` / `COMMAND_TOKEN` pairs and write them to your local `.env`. Remember to copy the new values into Render (or other hosting) after rotation.
 
 ### Smoke test
 
