@@ -119,11 +119,17 @@ jobs:
 
       - name: Fail job on smoke test errors
 <<<<<<< ours
+<<<<<<< ours
+<<<<<<< ours
         if: ${{ steps.smoke.outcome == 'failure' }}
         run: |
           echo "Smoke test failed with exit code ${{ steps.badge.outputs.exit_code }}"
           exit 1
 =======
+=======
+>>>>>>> theirs
+=======
+>>>>>>> theirs
         if: ${{ steps.badge.outputs.exit_code != '0' && steps.badge.outputs.exit_code != '2' }}
         run: exit 1
 >>>>>>> theirs
