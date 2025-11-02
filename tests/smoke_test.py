@@ -43,6 +43,16 @@ def request_json(method: str, url: str, *, headers: dict[str, str] | None = None
         raise SmokeTestOffline(f"Network request failed while contacting {url}: {exc}") from exc
     except RequestException as exc:
         raise SmokeTestError(f"{method} {url} failed before receiving a response: {exc}") from exc
+    if response.status_code == 503:
+        try:
+            body = response.json()
+            status = body.get("status")
+            freshness = body.get("telemetry", {}).get("fresh")
+            if status or freshness is not None:
+                raise SmokeTestOffline(f"{method} {url} -> 503 {status or 'service unavailable'}")
+        except json.JSONDecodeError:
+            pass
+        raise SmokeTestOffline(f"{method} {url} -> 503 service unavailable")
     if response.status_code != 200:
         raise SmokeTestError(f"{method} {url} -> {response.status_code} {response.text}")
     try:
@@ -72,9 +82,10 @@ def check_health(config: SmokeTestConfig) -> None:
     telemetry = payload.get("telemetry", {})
     if status != "ok":
         age = telemetry.get("seconds_since_update")
-        raise SmokeTestError(f"/health reported status={status} (age={age})")
+        raise SmokeTestOffline(f"/health reported status={status} (age={age})")
     if not telemetry.get("fresh"):
-        raise SmokeTestError("/health indicates telemetry is stale")
+        age = telemetry.get("seconds_since_update")
+        raise SmokeTestOffline(f"/health indicates telemetry is stale (age={age})")
 
 
 def check_state(config: SmokeTestConfig) -> None:

@@ -48,32 +48,48 @@ jobs:
           fi
           case "$exit_code" in
             0)
-              message="online / pass"
-              color="brightgreen"
+              availability="online"
+              availability_color="brightgreen"
+              result="pass"
+              result_color="brightgreen"
               ;;
             2)
-              message="offline / fail"
-              color="lightgrey"
+              availability="offline"
+              availability_color="lightgrey"
+              result="fail"
+              result_color="orange"
               ;;
             *)
-              message="error / fail"
-              color="red"
+              availability="error"
+              availability_color="red"
+              result="fail"
+              result_color="red"
               ;;
           esac
-          echo "message=$message" >> "$GITHUB_OUTPUT"
-          echo "color=$color" >> "$GITHUB_OUTPUT"
+          echo "availability=$availability" >> "$GITHUB_OUTPUT"
+          echo "availability_color=$availability_color" >> "$GITHUB_OUTPUT"
+          echo "result=$result" >> "$GITHUB_OUTPUT"
+          echo "result_color=$result_color" >> "$GITHUB_OUTPUT"
           echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
 
       - name: Build badge payload
         if: ${{ always() }}
         run: |
           mkdir -p badge
-          cat <<EOF > badge/smoke-test.json
+          cat <<EOF > badge/smoke-availability.json
+          {
+            "schemaVersion": 1,
+            "label": "Smoke Availability",
+            "message": "${{ steps.badge.outputs.availability }}",
+            "color": "${{ steps.badge.outputs.availability_color }}"
+          }
+          EOF
+          cat <<EOF > badge/smoke-status.json
           {
             "schemaVersion": 1,
             "label": "Smoke Test",
-            "message": "${{ steps.badge.outputs.message }}",
-            "color": "${{ steps.badge.outputs.color }}"
+            "message": "${{ steps.badge.outputs.result }}",
+            "color": "${{ steps.badge.outputs.result_color }}"
           }
           EOF
 
