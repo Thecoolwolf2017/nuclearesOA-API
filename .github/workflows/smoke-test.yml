@@ -7,6 +7,9 @@ on:
   schedule:
     - cron: "0 * * * *"
 
+permissions:
+  contents: write
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
@@ -42,30 +45,28 @@ jobs:
         if: ${{ always() }}
         id: badge
         run: |
-          exit_code="${{ steps.smoke.outputs.exit_code }}"
+          exit_code_raw="${{ steps.smoke.outputs.exit_code }}"
+          exit_code="$(printf '%s' \"$exit_code_raw\" | tr -d '\r\n')"
           if [ -z "$exit_code" ]; then
             exit_code="1"
           fi
-          case "$exit_code" in
-            0)
-              availability="online"
-              availability_color="brightgreen"
-              result="pass"
-              result_color="brightgreen"
-              ;;
-            2)
-              availability="offline"
-              availability_color="lightgrey"
-              result="fail"
-              result_color="orange"
-              ;;
-            *)
-              availability="error"
-              availability_color="red"
-              result="fail"
-              result_color="red"
-              ;;
-          esac
+          echo "Resolved exit code: '$exit_code'"
+          if [ "$exit_code" = "0" ]; then
+            availability="online"
+            availability_color="brightgreen"
+            result="pass"
+            result_color="brightgreen"
+          elif [ "$exit_code" = "2" ]; then
+            availability="offline"
+            availability_color="lightgrey"
+            result="fail"
+            result_color="orange"
+          else
+            availability="error"
+            availability_color="red"
+            result="fail"
+            result_color="red"
+          fi
           echo "availability=$availability" >> "$GITHUB_OUTPUT"
           echo "availability_color=$availability_color" >> "$GITHUB_OUTPUT"
           echo "result=$result" >> "$GITHUB_OUTPUT"
@@ -94,6 +95,13 @@ jobs:
             "cacheSeconds": 300
           }
           EOF
+
+      - name: Debug badge outputs
+        if: ${{ always() }}
+        run: |
+          echo "Badge availability: ${{ steps.badge.outputs.availability }}"
+          echo "Badge result: ${{ steps.badge.outputs.result }}"
+          echo "Badge exit code: ${{ steps.badge.outputs.exit_code }}"
 
       - name: Publish smoke test badge
         if: ${{ always() }}
