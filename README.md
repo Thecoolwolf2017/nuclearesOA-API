@@ -1,6 +1,6 @@
 # Nucleares Operating Assistant API
-[![Smoke Availability](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Thecoolwolf2017/nuclearesOA-API/badges/smoke-availability.json&cacheSeconds=60)](https://github.com/Thecoolwolf2017/nuclearesOA-API/actions/workflows/smoke-test.yml)
-[![Smoke Test](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Thecoolwolf2017/nuclearesOA-API/badges/smoke-status.json&cacheSeconds=60)](https://github.com/Thecoolwolf2017/nuclearesOA-API/actions/workflows/smoke-test.yml)
+[![Smoke Availability](https://raw.githubusercontent.com/Thecoolwolf2017/nuclearesOA-API/badges/smoke-availability.svg)](https://github.com/Thecoolwolf2017/nuclearesOA-API/actions/workflows/smoke-test.yml)
+[![Smoke Test](https://raw.githubusercontent.com/Thecoolwolf2017/nuclearesOA-API/badges/smoke-status.svg)](https://github.com/Thecoolwolf2017/nuclearesOA-API/actions/workflows/smoke-test.yml)
 
 This project provides an API backend and client for connecting the game **Nucleares** with a GPT-powered "Operating Assistant". It collects live telemetry data from the in-game plant webserver, forwards it to a cloud API (Render), and makes it accessible to GPT agents for reasoning and operator guidance.
 
