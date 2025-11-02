@@ -100,33 +100,7 @@ jobs:
         if: ${{ always() }}
         run: |
           python -m pip install --quiet anybadge
-          python - <<'PY'
-from pathlib import Path
-import json
-from anybadge import Badge
-
-badge_dir = Path("badge")
-
-with (badge_dir / "smoke-availability.json").open("r", encoding="utf-8") as fh:
-    availability = json.load(fh)
-
-Badge(
-    label=availability["label"],
-    value=availability["message"],
-    default_color=availability["color"],
-    thresholds={availability["message"]: availability["color"]}
-).write_badge(badge_dir / "smoke-availability.svg")
-
-with (badge_dir / "smoke-status.json").open("r", encoding="utf-8") as fh:
-    status = json.load(fh)
-
-Badge(
-    label=status["label"],
-    value=status["message"],
-    default_color=status["color"],
-    thresholds={status["message"]: status["color"]}
-).write_badge(badge_dir / "smoke-status.svg")
-PY
+          python -c "import json, pathlib; from anybadge import Badge; badge_dir = pathlib.Path('badge'); availability = json.loads((badge_dir / 'smoke-availability.json').read_text(encoding='utf-8')); Badge(label=availability['label'], value=availability['message'], default_color=availability['color'], thresholds={availability['message']: availability['color']}).write_badge(badge_dir / 'smoke-availability.svg'); status = json.loads((badge_dir / 'smoke-status.json').read_text(encoding='utf-8')); Badge(label=status['label'], value=status['message'], default_color=status['color'], thresholds={status['message']: status['color']}).write_badge(badge_dir / 'smoke-status.svg')"
 
       - name: Debug badge outputs
         if: ${{ always() }}
