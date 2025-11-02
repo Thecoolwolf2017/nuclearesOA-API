@@ -81,7 +81,8 @@ jobs:
             "schemaVersion": 1,
             "label": "Smoke Availability",
             "message": "${{ steps.badge.outputs.availability }}",
-            "color": "${{ steps.badge.outputs.availability_color }}"
+            "color": "${{ steps.badge.outputs.availability_color }}",
+            "cacheSeconds": 300
           }
           EOF
           cat <<EOF > badge/smoke-status.json
@@ -89,7 +90,8 @@ jobs:
             "schemaVersion": 1,
             "label": "Smoke Test",
             "message": "${{ steps.badge.outputs.result }}",
-            "color": "${{ steps.badge.outputs.result_color }}"
+            "color": "${{ steps.badge.outputs.result_color }}",
+            "cacheSeconds": 300
           }
           EOF
 
