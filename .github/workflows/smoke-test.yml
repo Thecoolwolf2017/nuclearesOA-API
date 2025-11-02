@@ -100,29 +100,8 @@ jobs:
         if: ${{ always() }}
         run: |
           python -m pip install --quiet anybadge
-          python - <<'PY'
-    from pathlib import Path
-    import json
-    from anybadge import Badge
-
-    badge_dir = Path("badge")
-
-    with (badge_dir / "smoke-availability.json").open("r", encoding="utf-8") as fh:
-        availability = json.load(fh)
-    Badge(
-        label=availability["label"],
-        value=availability["message"],
-        default_color=availability["color"],
-    ).write_badge(badge_dir / "smoke-availability.svg")
-
-    with (badge_dir / "smoke-status.json").open("r", encoding="utf-8") as fh:
-        status = json.load(fh)
-    Badge(
-        label=status["label"],
-        value=status["message"],
-        default_color=status["color"],
-    ).write_badge(badge_dir / "smoke-status.svg")
-    PY
+          anybadge --label "Smoke Availability" --value "${{ steps.badge.outputs.availability }}" --color "${{ steps.badge.outputs.availability_color }}" --file badge/smoke-availability.svg
+          anybadge --label "Smoke Test" --value "${{ steps.badge.outputs.result }}" --color "${{ steps.badge.outputs.result_color }}" --file badge/smoke-status.svg
 
       - name: Debug badge outputs
         if: ${{ always() }}
