@@ -100,8 +100,39 @@ jobs:
         if: ${{ always() }}
         run: |
           python -m pip install --quiet anybadge
-          anybadge --label "Smoke Availability" --value "${{ steps.badge.outputs.availability }}" --color "${{ steps.badge.outputs.availability_color }}" --file badge/smoke-availability.svg
-          anybadge --label "Smoke Test" --value "${{ steps.badge.outputs.result }}" --color "${{ steps.badge.outputs.result_color }}" --file badge/smoke-status.svg
+          python - <<'PY'
+from pathlib import Path
+import json
+from anybadge import Badge, Level
+
+badge_dir = Path("badge")
+
+with (badge_dir / "smoke-availability.json").open("r", encoding="utf-8") as fh:
+    availability = json.load(fh)
+
+availability_levels = {
+    availability["message"]: availability["color"]
+}
+Badge(
+    label=availability["label"],
+    value=availability["message"],
+    levels=availability_levels,
+    default_color=availability["color"]
+).write_badge(badge_dir / "smoke-availability.svg")
+
+with (badge_dir / "smoke-status.json").open("r", encoding="utf-8") as fh:
+    status = json.load(fh)
+
+status_levels = {
+    status["message"]: status["color"]
+}
+Badge(
+    label=status["label"],
+    value=status["message"],
+    levels=status_levels,
+    default_color=status["color"]
+).write_badge(badge_dir / "smoke-status.svg")
+PY
 
       - name: Debug badge outputs
         if: ${{ always() }}
