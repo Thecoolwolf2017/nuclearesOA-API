@@ -7,6 +7,11 @@ A stripped version of the assistant, without API capabilities, can be found [her
 ## How it works
 The GPT is fed data stored in `GPT/documentation`. It uses this data to help and guide the player in operating the in-game nuclear power plant. A private copy of this GPT can be made by OpenAI Plus members, with the capability to query the game webserver through the API. The API receives data from the sender script running locally, which routes it from the local webserver to a public one. The server now organizes every available webserver variable on-demand so GPT can query everything that the game exposes.
 
+## Quick start
+1. **Deploy the API server** locally or on Render using the steps in the [Deployment](#deployment) section.
+2. **Run the telemetry sender** so your game webserver streams data to the API (see [Running the sender locally](#running-the-sender-locally)).
+3. **Connect the custom GPT action** by uploading the manifest in `GPT/action.yaml` and wiring in your API URL and command token (see [Custom GPT setup](#custom-gpt-setup)).
+
 ## Deployment
 The server is designed to run on [Render](https://render.com).
 
@@ -15,7 +20,38 @@ The server is designed to run on [Render](https://render.com).
 - HMAC signature validation for client POSTs
 - Command queue secured by `COMMAND_TOKEN`
 
-See `render.yaml` for service configuration.
+### Run locally (development/testing)
+1. Create a virtual environment and install dependencies:
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate
+   pip install -r requirements.txt
+   ```
+2. Provide authentication secrets for this shell:
+   ```powershell
+   $env:API_KEY = "choose-a-long-random-string"
+   $env:COMMAND_TOKEN = "choose-another-secret"
+   ```
+   > On macOS/Linux use `export API_KEY=...` / `export COMMAND_TOKEN=...`.
+3. Launch the API with Uvicorn:
+   ```powershell
+   python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+   ```
+4. Visit `http://localhost:8000/docs` to explore the OpenAPI UI. While the sender is offline the state endpoints return `404` (no snapshot yet).
+
+Point the sender at the local instance by setting `API_URL` to `http://localhost:8000/api/state` and `COMMAND_URL` to `http://localhost:8000/api/commands`.
+
+### Deploy to Render (production)
+1. Fork or import this repository into your Render account.
+2. Create a **Web Service** and let Render auto-detect the `render.yaml` blueprint, or supply the following command manually:
+   ```
+   python -m uvicorn main:app --host 0.0.0.0 --port 10000
+   ```
+3. Set the environment variables in Render’s dashboard:
+   - `API_KEY`: shared secret that signs `/api/state` updates from the sender.
+   - `COMMAND_TOKEN`: shared secret shared by GPT and the sender for command operations.
+4. Deploy the service and note the Render URL, e.g. `https://nuclearesoa-api-xxxx.onrender.com`.
+5. Update `client/config.json` (`API_URL`, `COMMAND_URL`) and `GPT/action.yaml` (`servers[0].url`) to reference your Render hostname.
 
 Configure the following environment variables on Render:
 
@@ -107,6 +143,19 @@ Supported task operations:
 - `pulse`: send `value`, wait `hold_seconds` (default 1 second), then send `reset_value`.
 
 Additional context supplied in `metadata` or `guidance` is forwarded to the client and written back in the execution result.
+
+## Custom GPT setup
+1. Edit `GPT/action.yaml` and replace the placeholder server URL (`https://your-render-service.onrender.com/api`) with your deployed hostname (for local testing use `http://localhost:8000/api`).
+2. Optional: drop additional reference material into `GPT/documentation` so the assistant can cite it.
+3. Create a zip of the `GPT` directory:
+   ```powershell
+   Compress-Archive -Path GPT\* -DestinationPath nucleares-gpt.zip -Force
+   ```
+   > On macOS/Linux use `zip -r nucleares-gpt.zip GPT`.
+4. In ChatGPT (Plus / Team), open **Explore GPTs → Create** and switch to the **Configure** tab.
+5. Under **Actions**, choose **Upload action** and select `nucleares-gpt.zip` (or directly upload `GPT/action.yaml`).
+6. When prompted for authentication, add a secret named `CommandToken` with the same value you configured in the API (`COMMAND_TOKEN`). This ensures command endpoints require the shared header `X-Command-Token`.
+7. Save the GPT and use the built-in tester to call `/groups` or `/state` with a small `limit` to confirm the connection before sharing it with others.
 
 ## Privacy
 This API is designed **only for simulation/gameplay purposes**.
