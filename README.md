@@ -68,7 +68,7 @@ Configure the following environment variables on Render:
 
 - `API_KEY`: shared secret used to sign `/api/state` updates.
 - `COMMAND_TOKEN`: shared secret used by GPT (for command creation) and the local sender (for command execution).
-- `HEALTH_MAX_AGE_SECONDS` (optional): maximum allowed telemetry age before `/api/health` reports `stale` (defaults to 300).
+- `HEALTH_MAX_AGE_SECONDS` (optional): maximum allowed telemetry age before `/api/health` reports `stale` (defaults to 300 seconds).
 
 ## API Endpoints
 All endpoints are served beneath `/api`.

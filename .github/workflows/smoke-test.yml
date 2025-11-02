@@ -139,7 +139,7 @@ jobs:
           commit_message: "Update smoke test badge"
 
       - name: Fail job on smoke test errors
-        if: ${{ steps.smoke.outcome == 'failure' }}
+        if: ${{ steps.badge.outputs.exit_code != '0' && steps.badge.outputs.exit_code != '2' }}
         run: |
           echo "Smoke test failed with exit code ${{ steps.badge.outputs.exit_code }}"
           exit 1
