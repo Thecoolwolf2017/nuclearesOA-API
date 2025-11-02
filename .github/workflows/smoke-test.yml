@@ -99,28 +99,7 @@ jobs:
       - name: Generate badge SVGs
         if: ${{ always() }}
         run: |
-          python - <<'PY'
-from pathlib import Path
-import json
-from urllib.parse import quote_plus
-from urllib.request import urlretrieve
-
-badge_dir = Path("badge")
-badge_dir.mkdir(exist_ok=True)
-
-def fetch(name: str) -> None:
-    data = json.loads((badge_dir / f"{name}.json").read_text(encoding="utf-8"))
-    url = (
-        "https://img.shields.io/static/v1"
-        f"?label={quote_plus(data['label'])}"
-        f"&message={quote_plus(data['message'])}"
-        f"&color={quote_plus(data['color'])}"
-    )
-    urlretrieve(url, badge_dir / f"{name}.svg")
-
-fetch("smoke-availability")
-fetch("smoke-status")
-PY
+          python -c "import json, pathlib; from urllib.request import urlretrieve; from urllib.parse import quote; badge_dir = pathlib.Path('badge'); badge_dir.mkdir(exist_ok=True);\nfor name in ('smoke-availability','smoke-status'):\n    data = json.loads((badge_dir / f'{name}.json').read_text(encoding='utf-8'))\n    url = 'https://img.shields.io/static/v1?label={}&message={}&color={}'.format(quote(data['label']), quote(data['message']), quote(data['color']))\n    urlretrieve(url, badge_dir / f'{name}.svg')"
 
       - name: Debug badge outputs
         if: ${{ always() }}
@@ -139,7 +118,12 @@ PY
           commit_message: "Update smoke test badge"
 
       - name: Fail job on smoke test errors
+<<<<<<< ours
         if: ${{ steps.smoke.outcome == 'failure' }}
         run: |
           echo "Smoke test failed with exit code ${{ steps.badge.outputs.exit_code }}"
           exit 1
+=======
+        if: ${{ steps.badge.outputs.exit_code != '0' && steps.badge.outputs.exit_code != '2' }}
+        run: exit 1
+>>>>>>> theirs
