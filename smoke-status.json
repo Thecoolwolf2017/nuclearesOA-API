@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
   "label": "Smoke Test",
-  "message": "error / fail",
-  "color": "red"
+  "message": "fail",
+  "color": "orange"
 }
