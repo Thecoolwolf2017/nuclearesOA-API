@@ -34,6 +34,7 @@ jobs:
           set +e
           python tests/smoke_test.py
           exit_code=$?
+          set -e
           echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
           exit $exit_code
 
@@ -47,15 +48,15 @@ jobs:
           fi
           case "$exit_code" in
             0)
-              message="online"
+              message="online / pass"
               color="brightgreen"
               ;;
             2)
-              message="offline"
+              message="offline / fail"
               color="lightgrey"
               ;;
             *)
-              message="failing"
+              message="error / fail"
               color="red"
               ;;
           esac
@@ -86,5 +87,5 @@ jobs:
           commit_message: "Update smoke test badge"
 
       - name: Fail job on smoke test errors
-        if: ${{ steps.badge.outputs.exit_code != '0' && steps.badge.outputs.exit_code != '2' }}
+        if: ${{ steps.badge.outputs.exit_code != '0' }}
         run: exit 1
