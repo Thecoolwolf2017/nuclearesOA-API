@@ -101,37 +101,31 @@ jobs:
         run: |
           python -m pip install --quiet anybadge
           python - <<'PY'
-    from pathlib import Path
-    import json
-    from anybadge import Badge, Level
+from pathlib import Path
+import json
+from anybadge import Badge
 
-    badge_dir = Path("badge")
+badge_dir = Path("badge")
 
-    with (badge_dir / "smoke-availability.json").open("r", encoding="utf-8") as fh:
-        availability = json.load(fh)
+with (badge_dir / "smoke-availability.json").open("r", encoding="utf-8") as fh:
+    availability = json.load(fh)
 
-    availability_levels = {
-        availability["message"]: availability["color"]
-    }
-    Badge(
-        label=availability["label"],
-        value=availability["message"],
-        levels=availability_levels,
-        default_color=availability["color"]
-    ).write_badge(badge_dir / "smoke-availability.svg")
+Badge(
+    label=availability["label"],
+    value=availability["message"],
+    default_color=availability["color"],
+    thresholds={availability["message"]: availability["color"]}
+).write_badge(badge_dir / "smoke-availability.svg")
 
-    with (badge_dir / "smoke-status.json").open("r", encoding="utf-8") as fh:
-        status = json.load(fh)
+with (badge_dir / "smoke-status.json").open("r", encoding="utf-8") as fh:
+    status = json.load(fh)
 
-    status_levels = {
-        status["message"]: status["color"]
-    }
-    Badge(
-        label=status["label"],
-        value=status["message"],
-        levels=status_levels,
-        default_color=status["color"]
-    ).write_badge(badge_dir / "smoke-status.svg")
+Badge(
+    label=status["label"],
+    value=status["message"],
+    default_color=status["color"],
+    thresholds={status["message"]: status["color"]}
+).write_badge(badge_dir / "smoke-status.svg")
 PY
 
       - name: Debug badge outputs
