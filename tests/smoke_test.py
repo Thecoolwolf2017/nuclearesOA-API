@@ -7,10 +7,17 @@ from dataclasses import dataclass
 from typing import Any
 
 import requests
+from requests import RequestException
+from requests.exceptions import ConnectionError as RequestsConnectionError
+from requests.exceptions import Timeout as RequestsTimeout
 
 
 class SmokeTestError(Exception):
     """Raised when the smoke test encounters a failure."""
+
+
+class SmokeTestOffline(SmokeTestError):
+    """Raised when the smoke test should be skipped due to offline execution."""
 
 
 @dataclass
@@ -30,13 +37,25 @@ class SmokeTestConfig:
 
 
 def request_json(method: str, url: str, *, headers: dict[str, str] | None = None, timeout: float = 10.0) -> Any:
-    response = requests.request(method, url, headers=headers, timeout=timeout)
+    try:
+        response = requests.request(method, url, headers=headers, timeout=timeout)
+    except (RequestsConnectionError, RequestsTimeout) as exc:
+        raise SmokeTestOffline(f"Network request failed while contacting {url}: {exc}") from exc
+    except RequestException as exc:
+        raise SmokeTestError(f"{method} {url} failed before receiving a response: {exc}") from exc
     if response.status_code != 200:
         raise SmokeTestError(f"{method} {url} -> {response.status_code} {response.text}")
     try:
         return response.json()
     except json.JSONDecodeError as exc:
         raise SmokeTestError(f"{method} {url} returned non-JSON body") from exc
+
+
+def running_in_ci() -> bool:
+    """Best-effort detection for CI environments."""
+    ci = os.getenv("CI")
+    gh = os.getenv("GITHUB_ACTIONS")
+    return any(value for value in (ci, gh))
 
 
 def check_groups(config: SmokeTestConfig) -> None:
@@ -93,6 +112,12 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
+    except SmokeTestOffline as exc:
+        if running_in_ci():
+            print(f"Smoke test failed: {exc}", file=sys.stderr)
+            raise SystemExit(1) from exc
+        print(f"Smoke test skipped: {exc}", file=sys.stderr)
+        raise SystemExit(0) from exc
     except SmokeTestError as exc:
         print(f"Smoke test failed: {exc}", file=sys.stderr)
         raise SystemExit(1) from exc
