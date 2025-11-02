@@ -3,5 +3,5 @@
   "label": "Smoke Availability",
   "message": "online",
   "color": "brightgreen",
-  "cacheSeconds": 300
+  "cacheSeconds": 30
 }
