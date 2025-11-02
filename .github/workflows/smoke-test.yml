@@ -46,7 +46,7 @@ jobs:
         id: badge
         run: |
           exit_code_raw="${{ steps.smoke.outputs.exit_code }}"
-          exit_code="$(printf '%s' \"$exit_code_raw\" | tr -d '\r\n')"
+          exit_code="$(printf '%s' \"$exit_code_raw\" | tr -d '\r\n\"')"
           if [ -z "$exit_code" ]; then
             exit_code="1"
           fi
