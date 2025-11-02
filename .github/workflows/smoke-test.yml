@@ -25,8 +25,66 @@ jobs:
           pip install -r requirements.txt requests
 
       - name: Run API smoke test
+        id: smoke
+        continue-on-error: true
         env:
           NUCLEARES_API_BASE: ${{ secrets.NUCLEARES_API_BASE }}
           NUCLEARES_COMMAND_TOKEN: ${{ secrets.NUCLEARES_COMMAND_TOKEN }}
         run: |
+          set +e
           python tests/smoke_test.py
+          exit_code=$?
+          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+          exit $exit_code
+
+      - name: Determine badge state
+        if: ${{ always() }}
+        id: badge
+        run: |
+          exit_code="${{ steps.smoke.outputs.exit_code }}"
+          if [ -z "$exit_code" ]; then
+            exit_code="1"
+          fi
+          case "$exit_code" in
+            0)
+              message="online"
+              color="brightgreen"
+              ;;
+            2)
+              message="offline"
+              color="lightgrey"
+              ;;
+            *)
+              message="failing"
+              color="red"
+              ;;
+          esac
+          echo "message=$message" >> "$GITHUB_OUTPUT"
+          echo "color=$color" >> "$GITHUB_OUTPUT"
+          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+
+      - name: Build badge payload
+        if: ${{ always() }}
+        run: |
+          mkdir -p badge
+          cat <<EOF > badge/smoke-test.json
+          {
+            "schemaVersion": 1,
+            "label": "Smoke Test",
+            "message": "${{ steps.badge.outputs.message }}",
+            "color": "${{ steps.badge.outputs.color }}"
+          }
+          EOF
+
+      - name: Publish smoke test badge
+        if: ${{ always() }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: badges
+          publish_dir: badge
+          commit_message: "Update smoke test badge"
+
+      - name: Fail job on smoke test errors
+        if: ${{ steps.badge.outputs.exit_code != '0' && steps.badge.outputs.exit_code != '2' }}
+        run: exit 1

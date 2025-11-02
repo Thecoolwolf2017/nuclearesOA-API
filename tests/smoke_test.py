@@ -115,7 +115,7 @@ if __name__ == "__main__":
     except SmokeTestOffline as exc:
         if running_in_ci():
             print(f"Smoke test failed: {exc}", file=sys.stderr)
-            raise SystemExit(1) from exc
+            raise SystemExit(2) from exc
         print(f"Smoke test skipped: {exc}", file=sys.stderr)
         raise SystemExit(0) from exc
     except SmokeTestError as exc:
