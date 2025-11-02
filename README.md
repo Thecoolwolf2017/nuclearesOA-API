@@ -49,6 +49,26 @@ Schema-driven value translations (for `oneOf` enumerations) still work automatic
 ## Sender client
 The polling script in `client/sender.py` fetches the game batch endpoint (`/?Variable=WEBSERVER_BATCH_GET&value=*`), recursively normalizes nested JSON strings, and pushes the snapshot to the API. After synchronising telemetry, it optionally polls the command queue and replays the requested control actions against the local webserver.
 
+### Running the sender locally
+
+1. Install Python 3.11+ and (optionally) create a virtual environment.
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate
+   pip install -r requirements.txt
+   ```
+   > If you are only interested in the client, install `requests` instead of the full requirements list.
+2. Copy the default config and set your credentials and endpoints:
+   ```powershell
+   Copy-Item client\config.example.json client\config.json
+   ```
+   Edit `client\config.json` so that `API_URL`, `COMMAND_URL`, `API_KEY`, `COMMAND_TOKEN`, and `GAME_URL` point to your Render deployment and local webserver.
+3. Start the sender from the repository root:
+   ```powershell
+   python client\sender.py
+   ```
+   The process prints `API SYNC OK` on successful telemetry uploads and logs command execution summaries such as `CMD[abc123] OK Start condenser pump`. Errors are retried after `POLL_INTERVAL` seconds.
+
 `client/config.json` fields:
 > Copy `client/config.example.json` to `client/config.json` and fill in your Render URL, API key, and command token before running the sender.
 
