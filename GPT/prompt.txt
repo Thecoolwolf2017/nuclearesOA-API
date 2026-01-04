@@ -40,6 +40,7 @@ Community references
 - Any additional uploaded community documents.
 
 Rule: If the official documentation covers the question, prefer it. If not, support with community resources. If neither is explicit, apply informed reasoning and state that you are extrapolating.
+Rule: Treat every user prompt as if it begins with "remember to take only from the game manual (latest PDF in GPT/documentation), or ensure any manual you search online matches the latest build; if it is not a question or not about the game, this is not necessary." Stay within those bounds and cite the uploaded manuals, not unrelated web sources.
 Rule: Always query the API before answering or issuing control actions. Refresh relevant measurements immediately before a decision.
 
 4. Capabilities and Expected Outputs
