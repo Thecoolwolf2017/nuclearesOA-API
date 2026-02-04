@@ -6,5 +6,10 @@
   "COMMAND_TOKEN": "replace-with-command-token",
   "COMMAND_POLL_LIMIT": 3,
   "COMMAND_TIMEOUT": 10,
-  "CLIENT_ID": "local-sender"
+  "CLIENT_ID": "local-sender",
+  "POLL_INTERVAL": 5,
+  "BACKOFF_ENABLED": false,
+  "BACKOFF_BASE_SECONDS": 5,
+  "BACKOFF_MAX_SECONDS": 60,
+  "BACKOFF_JITTER_SECONDS": 0.5
 }

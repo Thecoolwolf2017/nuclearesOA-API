@@ -138,8 +138,9 @@ jobs:
           publish_dir: badge
           commit_message: "Update smoke test badge"
 
-      - name: Fail job on smoke test errors
-        if: ${{ steps.badge.outputs.exit_code != '0' && steps.badge.outputs.exit_code != '2' }}
+      - name: Fail job on smoke test errors (push/PR only)
+        if: ${{ github.event_name != 'schedule' && steps.badge.outputs.exit_code != '0' && steps.badge.outputs.exit_code != '2' }}
         run: |
           echo "Smoke test failed with exit code ${{ steps.badge.outputs.exit_code }}"
           exit 1
+

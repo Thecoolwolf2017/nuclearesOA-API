@@ -4,6 +4,7 @@ import hmac
 import time
 import socket
 import hashlib
+import random
 import requests
 from typing import Any, Dict, Iterable, List, Set
 from urllib.parse import urljoin
@@ -23,7 +24,31 @@ API_KEY = config['API_KEY'].encode()
 _game_base = config['GAME_URL'].rstrip('/') + '/'
 GAME_STATE_URL = urljoin(_game_base, '?Variable=WEBSERVER_BATCH_GET&value=*')
 GAME_COMMAND_URL = config.get('GAME_COMMAND_URL', _game_base)
-POLL_INTERVAL = config.get('POLL_INTERVAL', 5)
+
+
+def _coerce_float(value: Any, default: float) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _coerce_bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    return str(value).strip().lower() in {'1', 'true', 'yes', 'on'}
+
+
+POLL_INTERVAL = _coerce_float(config.get('POLL_INTERVAL', 5), 5.0)
+
+BACKOFF_ENABLED = _coerce_bool(config.get('BACKOFF_ENABLED', False))
+BACKOFF_BASE_SECONDS = max(
+    0.0, _coerce_float(config.get('BACKOFF_BASE_SECONDS', POLL_INTERVAL), POLL_INTERVAL)
+)
+BACKOFF_MAX_SECONDS = max(0.0, _coerce_float(config.get('BACKOFF_MAX_SECONDS', 60), 60.0))
+BACKOFF_JITTER_SECONDS = max(0.0, _coerce_float(config.get('BACKOFF_JITTER_SECONDS', 0.5), 0.5))
 
 # Command API configuration
 COMMAND_URL = config.get('COMMAND_URL')
@@ -255,8 +280,24 @@ if COMMAND_URL and COMMAND_TOKEN:
     )
 
 
+backoff_failures = 0
+
+
+def _compute_backoff_seconds(failures: int) -> float:
+    if not BACKOFF_ENABLED or failures <= 0 or BACKOFF_MAX_SECONDS <= 0:
+        return 0.0
+    exponent = min(failures - 1, 30)
+    backoff = BACKOFF_BASE_SECONDS * (2 ** exponent)
+    if backoff > BACKOFF_MAX_SECONDS:
+        backoff = BACKOFF_MAX_SECONDS
+    if BACKOFF_JITTER_SECONDS > 0:
+        backoff += random.uniform(0.0, BACKOFF_JITTER_SECONDS)
+    return backoff
+
+
 while True:
     print('API SYNC ', end='')
+    had_failure = False
 
     try:
         resp = requests.get(GAME_STATE_URL, timeout=10)
@@ -294,9 +335,23 @@ while True:
         print('OK')
 
     except Exception as e:
+        had_failure = True
         print('FAIL:', e)
 
     if executor:
         executor.poll_and_execute()
 
-    time.sleep(POLL_INTERVAL)
+    if had_failure:
+        backoff_failures += 1
+    else:
+        backoff_failures = 0
+
+    sleep_seconds = POLL_INTERVAL
+    if backoff_failures:
+        backoff = _compute_backoff_seconds(backoff_failures)
+        if backoff > sleep_seconds:
+            sleep_seconds = backoff
+        if backoff > 0:
+            print(f'BACKOFF {sleep_seconds:.1f}s')
+
+    time.sleep(sleep_seconds)

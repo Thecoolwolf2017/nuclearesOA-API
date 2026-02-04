@@ -42,6 +42,7 @@ The server is designed to run on [Render](https://render.com).
    $env:COMMAND_TOKEN = "choose-another-secret"
    ```
    > On macOS/Linux use `export API_KEY=...` / `export COMMAND_TOKEN=...`.
+   > Local-only testing: you can set `ALLOW_INSECURE_DEFAULTS=1` to bypass the default-secret check, but use real secrets in production.
    > Tip: run `python scripts/rotate_secrets.py` to generate fresh values and store them in a local `.env`.
 3. Launch the API with Uvicorn:
    ```powershell
@@ -55,7 +56,7 @@ Point the sender at the local instance by setting `API_URL` to `http://localhost
 1. Fork or import this repository into your Render account.
 2. Create a **Web Service** and let Render auto-detect the `render.yaml` blueprint, or supply the following command manually:
    ```
-   python -m uvicorn main:app --host 0.0.0.0 --port 10000
+   python -m uvicorn main:app --host 0.0.0.0 --port 10000 --workers 1
    ```
 3. Set the environment variables in Render’s dashboard:
    - `API_KEY`: shared secret that signs `/api/state` updates from the sender.
@@ -63,12 +64,17 @@ Point the sender at the local instance by setting `API_URL` to `http://localhost
 4. Deploy the service and note the Render URL, e.g. `https://nuclearesoa-api-xxxx.onrender.com`.
 5. Update `client/config.json` (`API_URL`, `COMMAND_URL`) and `GPT/action.yaml` (`servers[0].url`) to reference your Render hostname.
 
-Configure the following environment variables on Render:
+Configure the following environment variables (Render or local):
 
 - `API_KEY`: shared secret used to sign `/api/state` updates.
 - `COMMAND_TOKEN`: shared secret used by GPT (for command creation) and the local sender (for command execution).
 - `HEALTH_MAX_AGE_SECONDS` (optional): maximum allowed telemetry age before `/api/health` reports `stale` (defaults to 300 seconds).
+- `COMMAND_CLAIM_TTL_SECONDS` (optional): seconds before in-progress commands are re-queued if no result is reported (defaults to 300).
 - `BUILD_SHA` / `BUILD_REF` (optional): metadata injected into `/api/status` for identifying deployments.
+- `STATE_MAX_AGE_SECONDS` / `STATE_MAX_FUTURE_SKEW_SECONDS` (optional): timestamp freshness limits for `/api/state` uploads.
+- `ALLOW_INSECURE_DEFAULTS` (optional): set to `1`/`true` to allow the server to start with default `changeme` secrets (local-only).
+
+> **Worker note:** The API stores telemetry and commands in memory, so it must run with a single Uvicorn worker unless you move state/commands to shared storage (e.g., Redis). Multi-worker deployments will produce inconsistent `/api/state` reads and command claims.
 
 > **Smoke test behaviour:** The GitHub Actions smoke workflow treats exit code `2` from `tests/smoke_test.py` as an intentional “offline” state. The job still succeeds so automation continues, but the availability/status badges flip to “offline / fail”. Any other non-zero exit code fails the workflow.
 
@@ -151,6 +157,10 @@ The polling script in `client/sender.py` fetches the game batch endpoint (`/?Var
 - `COMMAND_TIMEOUT` (optional): Seconds before HTTP command requests time out (defaults to 10).
 - `CLIENT_ID` (optional): Identifier reported when claiming commands (defaults to the hostname).
 - `POLL_INTERVAL` (optional): Seconds between telemetry polls (defaults to 5).
+- `BACKOFF_ENABLED` (optional): Enable exponential backoff after failed telemetry syncs (defaults to false).
+- `BACKOFF_BASE_SECONDS` (optional): Base delay for the first failure (defaults to `POLL_INTERVAL`).
+- `BACKOFF_MAX_SECONDS` (optional): Maximum backoff delay (defaults to 60).
+- `BACKOFF_JITTER_SECONDS` (optional): Random jitter added to the backoff delay (defaults to 0.5).
 
 The sender prints `API SYNC OK` on successful uploads, followed by command execution summaries (e.g., `CMD[abc123] OK Start condenser pump`). Errors are logged to the console and retried after the poll interval.
 

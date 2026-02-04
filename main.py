@@ -15,24 +15,30 @@ from uuid import uuid4
 
 from pydantic import BaseModel, Field, validator
 
-API_KEY = os.getenv("API_KEY", "changeme").encode()
+API_KEY_RAW = os.getenv("API_KEY", "changeme")
 COMMAND_TOKEN = os.getenv("COMMAND_TOKEN", "changeme")
+ALLOW_INSECURE_DEFAULTS = os.getenv("ALLOW_INSECURE_DEFAULTS", "").strip().lower() in {"1", "true", "yes"}
+
+API_KEY = API_KEY_RAW.encode()
 app = FastAPI()
 
 current_state: Dict[str, Any] = {}
 last_updated: str | None = None  # ISO 8601 string
 
-if API_KEY == b"changeme":
-    print(
-        "WARNING: API_KEY is set to default 'changeme'. Please configure it in Render environment variables.",
-        file=sys.stderr,
-    )
-
-if COMMAND_TOKEN == "changeme":
-    print(
-        "WARNING: COMMAND_TOKEN is set to default 'changeme'. Please configure it in Render environment variables.",
-        file=sys.stderr,
-    )
+if API_KEY_RAW == "changeme" or COMMAND_TOKEN == "changeme":
+    if ALLOW_INSECURE_DEFAULTS:
+        print(
+            "WARNING: API_KEY/COMMAND_TOKEN are set to the insecure default 'changeme'. "
+            "Set real secrets for production.",
+            file=sys.stderr,
+        )
+    else:
+        print(
+            "ERROR: API_KEY/COMMAND_TOKEN are set to the insecure default 'changeme'. "
+            "Set real secrets or export ALLOW_INSECURE_DEFAULTS=1 for local-only use.",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
 
 with open("variables.json", "r", encoding="utf-8") as f:
     SCHEMA = json.load(f)["properties"]
@@ -53,6 +59,9 @@ command_store: Dict[str, Dict[str, Any]] = {}
 command_sequence = count()
 COMMAND_HISTORY_LIMIT = 250
 HEALTH_MAX_AGE_SECONDS = int(os.getenv("HEALTH_MAX_AGE_SECONDS", "300"))
+STATE_MAX_AGE_SECONDS = int(os.getenv("STATE_MAX_AGE_SECONDS", str(HEALTH_MAX_AGE_SECONDS)))
+STATE_MAX_FUTURE_SKEW_SECONDS = int(os.getenv("STATE_MAX_FUTURE_SKEW_SECONDS", "60"))
+COMMAND_CLAIM_TTL_SECONDS = int(os.getenv("COMMAND_CLAIM_TTL_SECONDS", "300"))
 START_TIME = datetime.now(timezone.utc)
 BUILD_SHA = os.getenv("BUILD_SHA", "dev")
 BUILD_REF = os.getenv("BUILD_REF")
@@ -300,8 +309,12 @@ def _parse_timestamp(value: str | None) -> datetime | None:
     try:
         cleaned = value.rstrip("Z")
         if cleaned == value:
-            return datetime.fromisoformat(value)
-        return datetime.fromisoformat(f"{cleaned}+00:00")
+            parsed = datetime.fromisoformat(value)
+        else:
+            parsed = datetime.fromisoformat(f"{cleaned}+00:00")
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed
     except Exception:
         return None
 
@@ -346,6 +359,35 @@ def _build_status_payload(include_commands: bool = True) -> tuple[Dict[str, Any]
     return payload, telemetry_fresh
 
 
+def _requeue_stale_commands(now: datetime) -> int:
+    if COMMAND_CLAIM_TTL_SECONDS <= 0:
+        return 0
+
+    reclaimed = 0
+    for entry in command_store.values():
+        if entry.get("status") != "in_progress":
+            continue
+
+        claimed_at = _parse_timestamp(entry.get("claimed_at"))
+        if claimed_at is None:
+            entry["status"] = "pending"
+            entry["claimed_at"] = None
+            entry["claimed_by"] = None
+            entry["_reclaimed_at"] = now.isoformat()
+            reclaimed += 1
+            continue
+
+        age = (now - claimed_at).total_seconds()
+        if age >= COMMAND_CLAIM_TTL_SECONDS:
+            entry["status"] = "pending"
+            entry["claimed_at"] = None
+            entry["claimed_by"] = None
+            entry["_reclaimed_at"] = now.isoformat()
+            reclaimed += 1
+
+    return reclaimed
+
+
 @app.get("/api/status")
 async def get_status() -> Dict[str, Any]:
     payload, _ = _build_status_payload(include_commands=True)
@@ -378,8 +420,33 @@ async def update_state(request: Request):
     if not isinstance(data, dict):
         raise HTTPException(status_code=400, detail="Payload 'data' must be an object")
 
+    timestamp = payload.get("timestamp")
+    if not isinstance(timestamp, str) or not timestamp.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Payload 'timestamp' is required and must be an ISO-8601 string",
+        )
+    parsed_timestamp = _parse_timestamp(timestamp)
+    if parsed_timestamp is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Payload 'timestamp' must be a valid ISO-8601 timestamp",
+        )
+    now = datetime.now(timezone.utc)
+    age_seconds = (now - parsed_timestamp).total_seconds()
+    if age_seconds > STATE_MAX_AGE_SECONDS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Payload 'timestamp' is too old (age={age_seconds:.1f}s)",
+        )
+    if age_seconds < -STATE_MAX_FUTURE_SKEW_SECONDS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Payload 'timestamp' is too far in the future (age={age_seconds:.1f}s)",
+        )
+
     current_state = data
-    last_updated = payload.get("timestamp")
+    last_updated = timestamp
 
     return {"status": "updated", "updated_keys": list(data.keys())}
 
@@ -570,10 +637,12 @@ async def get_next_commands(
     if limit <= 0 or limit > 50:
         raise HTTPException(status_code=400, detail="limit must be between 1 and 50")
 
-    now = _now_iso()
+    now_dt = datetime.now(timezone.utc)
+    now = now_dt.isoformat()
     claimed: List[Dict[str, Any]] = []
 
     async with command_lock:
+        _requeue_stale_commands(now_dt)
         pending = [
             entry for entry in command_store.values() if entry["status"] == "pending"
         ]
